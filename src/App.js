@@ -1,6 +1,13 @@
 import React from "react";
 import { Admin, Resource } from 'react-admin';
+import { CustomRoutes } from 'react-admin';
+import { Route } from 'react-router-dom';
 import dataProvider from './dataProvider';
+import i18nProvider from './i18nProvider';
+import CustomLayout from './CustomLayout';
+import Dashboard from './Dashboard';
+
+import CalendarPage from './calendar/CalendarPage';
 
 import StudentList from './students/StudentList';
 import StudentCreate from './students/StudentCreate';
@@ -18,9 +25,18 @@ import TariffEdit from './tariffs/TariffEdit';
 import TariffShow from './tariffs/TariffShow';
 
 const App = () => (
-  <Admin dataProvider={dataProvider}>
+  <Admin 
+  dashboard={Dashboard} 
+  dataProvider={dataProvider} 
+  layout={CustomLayout}
+  i18nProvider={i18nProvider}
+  >
+    <CustomRoutes>
+      <Route path="/calendar" element={<CalendarPage />} />
+    </CustomRoutes>
     <Resource
       name="students"
+      options={{ label: 'resources.students.name' }}
       list={StudentList}
       create={StudentCreate}
       edit={StudentEdit}

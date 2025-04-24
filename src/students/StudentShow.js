@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Show, SimpleShowLayout, TextField, DateField, NumberField } from 'react-admin';
+import { Show, SimpleShowLayout, TextField, DateField, NumberField, ReferenceField  } from 'react-admin';
 
 const StudentShow = () => (
   <Show>
@@ -13,7 +13,9 @@ const StudentShow = () => (
       <TextField label="Platform" source="platform" />
       <NumberField label="School Start Year"  source="schoolStartYear" />
       <NumberField label="Current Grade" source="currentGrade" />
-      <TextField source="teacherId.id" label="Teacher ID" />
+      <ReferenceField source="teacher.id" reference="teachers">
+              <TextField source="name" />
+      </ReferenceField>
     </SimpleShowLayout>
   </Show>
 );

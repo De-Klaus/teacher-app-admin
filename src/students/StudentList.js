@@ -18,6 +18,7 @@ const StudentList = () => (
       <DateField source="birthDate" />
       <TextField source="platform" />
       <EditButton />
+      <ShowButton />
       <DeleteButton />
     </Datagrid>
   </List>
