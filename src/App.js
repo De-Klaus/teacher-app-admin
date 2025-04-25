@@ -24,6 +24,10 @@ import TariffCreate from './tariffs/TariffCreate';
 import TariffEdit from './tariffs/TariffEdit';
 import TariffShow from './tariffs/TariffShow';
 
+import LessonList from './lesson/LessonList';
+import LessonEdit from './lesson/LessonEdit';
+import LessonShow from './lesson/LessonShow';
+
 const App = () => (
   <Admin 
   dashboard={Dashboard} 
@@ -35,12 +39,12 @@ const App = () => (
       <Route path="/calendar" element={<CalendarPage />} />
     </CustomRoutes>
     <Resource
-      name="students"
-      options={{ label: 'resources.students.name' }}
-      list={StudentList}
-      create={StudentCreate}
-      edit={StudentEdit}
-      show={StudentShow}
+        name="students"
+        options={{ label: 'resources.students.name' }}
+        list={StudentList}
+        create={StudentCreate}
+        edit={StudentEdit}
+        show={StudentShow}
     />
     <Resource
         name="teachers"
@@ -55,6 +59,11 @@ const App = () => (
           create={TariffCreate} 
           edit={TariffEdit} 
           show={TariffShow} />
+    <Resource
+        name="lessons"
+        list={LessonList}
+        edit={LessonEdit}
+        show={LessonShow} />
   </Admin>
 );
 

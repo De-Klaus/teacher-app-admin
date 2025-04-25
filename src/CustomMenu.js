@@ -5,6 +5,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import BookIcon from '@mui/icons-material/Book';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EventIcon from '@mui/icons-material/Event';
+import SchoolIcon from '@mui/icons-material/School';
 
 const CustomMenu = () => {
   const [open] = useSidebarState();
@@ -22,15 +23,13 @@ const CustomMenu = () => {
         to="/students"
         primaryText={translate('resources.students.name')}
         leftIcon={<PeopleIcon />}
-        sidebarIsOpen={open}
-        selected={location.pathname.startsWith('/students')}
+        isSelected={location.pathname.startsWith('/students')}
       />
       <MenuItemLink
         to="/teachers"
         primaryText={translate('resources.teachers.name')}
         leftIcon={<PeopleIcon />}
-        sidebarIsOpen={open}
-        selected={location.pathname.startsWith('/teachers')}
+        isSelected={location.pathname.startsWith('/teachers')}
       />
 
       <h4 style={{ padding: '0 1em', marginTop: '1em' }}>
@@ -40,8 +39,19 @@ const CustomMenu = () => {
         to="/tariffs"
         primaryText={translate('resources.tariffs.name')}
         leftIcon={<BookIcon />}
-        sidebarIsOpen={open}
-        selected={location.pathname.startsWith('/tariffs')}
+        isSelected={location.pathname.startsWith('/tariffs')}
+      />
+      <MenuItemLink
+        to="/calendar"
+        primaryText={translate('menu.calendar')}
+        leftIcon={<EventIcon />}
+        isSelected={location.pathname.startsWith('/calendar')}
+      />
+      <MenuItemLink
+        to="/lessons"
+        primaryText={translate('menu.lesson')}
+        leftIcon={<SchoolIcon />}
+        isSelected={location.pathname.startsWith('/lessons')}
       />
 
       <h4 style={{ padding: '0 1em', marginTop: '1em' }}>
@@ -51,16 +61,8 @@ const CustomMenu = () => {
         to="/settings"
         primaryText={translate('menu.settings')}
         leftIcon={<SettingsIcon />}
-        sidebarIsOpen={open}
-        selected={location.pathname.startsWith('/settings')}
+        isSelected={location.pathname.startsWith('/settings')}
       />
-      <MenuItemLink
-        to="/calendar"
-        primaryText="Календарь"
-        leftIcon={<EventIcon />}
-        sidebarIsOpen={open}
-        selected={location.pathname.startsWith('/calendar')}
-        />
     </Menu>
   );
 };

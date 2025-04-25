@@ -10,12 +10,17 @@ export default {
     tariffs: {
       name: 'Тариф |||| Тарифы',
     },
+    lessons: {
+      name: "Уроки"
+    },
   },
   menu: {
     users: 'Ученики и Учителя',
     lessons: 'Уроки и Тарифы',
     settings: 'Настройки',
     dashboard: 'Главная',
+    calendar: 'Календарь',
+    lesson: 'Уроки',
   },
   page: {
     dashboard: 'Добро пожаловать',

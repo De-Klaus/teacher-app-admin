@@ -40,21 +40,23 @@ const LessonCalendar = ({ initialLessons = [] }) => {
     });
   }, [dataProvider]);
 
-  // преобразование данных в события
+  // Преобразование данных в события
   const events = useMemo(() => {
-    return lessons.map((lesson) => {
-      const start = new Date(lesson.lessonDate);
-      const end = new Date(lesson.lessonDate);
-      end.setHours(start.getHours() + 1); // Добавляем 1 час к событию
+    return lessons
+      .filter((lesson) => lesson?.lessonDate)
+      .map((lesson) => {
+        const start = new Date(lesson.lessonDate);
+        const end = new Date(start);
+        end.setHours(start.getHours() + 1);
 
-      return {
-        id: lesson.id,
-        title: lesson.topic || 'Урок',
-        start,
-        end,
-        resource: lesson,
-      };
-    });
+        return {
+          id: lesson.id,
+          title: lesson.topic || 'Урок',
+          start,
+          end,
+          resource: lesson,
+        };
+      });
   }, [lessons]);
 
   const handleSelectEvent = (event) => {
@@ -62,16 +64,20 @@ const LessonCalendar = ({ initialLessons = [] }) => {
   };
 
   const handleSelectSlot = ({ start }) => {
-    const date = start.toISOString().split('T')[0];
     const topic = prompt('Введите тему урока:');
     if (!topic) return;
 
-    // создание урока
+    // Сохраняем дату как локальное время без временной зоны
+    const localStartDate = new Date(start);
+    localStartDate.setMinutes(localStartDate.getMinutes() - localStartDate.getTimezoneOffset()); // Преобразуем в локальное время
+
+    const lessonDate = localStartDate.toISOString(); // сохраняем полную дату-время в ISO формате
+
     create(
       'lessons',
       {
         data: {
-          lessonDate: date,
+          lessonDate,
           topic,
           isActual: 1,
         },
@@ -80,6 +86,17 @@ const LessonCalendar = ({ initialLessons = [] }) => {
         onSuccess: ({ data }) => {
           notify('Урок успешно добавлен', { type: 'success' });
           setLessons((prev) => [...prev, data]);
+
+          // Обновляем список уроков
+          dataProvider.getList('lessons', {
+            pagination: { page: 1, perPage: 100 },
+            sort: { field: 'lessonDate', order: 'ASC' },
+            filter: {},
+          }).then(({ data }) => {
+            setLessons(data);
+          });
+
+          redirect('/calendar'); // редирект обратно в календарь
         },
         onError: (error) => {
           console.error(error);
