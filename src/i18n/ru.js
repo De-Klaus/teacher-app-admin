@@ -1,5 +1,20 @@
 // src/i18n/ru.js
+import russianMessages from 'ra-language-russian';
+
 export default {
+  ...russianMessages,
+  ra: {
+    ...russianMessages.ra,
+    auth: {
+      ...russianMessages.ra?.auth,
+      email: 'Email',
+      password: 'Пароль',
+      sign_in: 'Войти',
+      logout: 'Выйти',
+      sign_in_error: 'Ошибка авторизации, проверьте данные',
+      user_menu: 'Профиль',
+    },
+  },
   resources: {
     students: {
       name: 'Ученик |||| Ученики',
