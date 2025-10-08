@@ -3,6 +3,7 @@ import { Admin, Resource } from 'react-admin';
 import { CustomRoutes } from 'react-admin';
 import { Route } from 'react-router-dom';
 import dataProvider from './dataProvider';
+import authProvider from './authProvider';
 import i18nProvider from './i18nProvider';
 import CustomLayout from './CustomLayout';
 import Dashboard from './Dashboard';
@@ -32,6 +33,7 @@ const App = () => (
   <Admin 
   dashboard={Dashboard} 
   dataProvider={dataProvider} 
+  authProvider={authProvider}
   layout={CustomLayout}
   i18nProvider={i18nProvider}
   >

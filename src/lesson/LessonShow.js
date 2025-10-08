@@ -1,4 +1,5 @@
 import React from 'react';
+import { FunctionField } from 'react-admin';
 import {
   Show,
   SimpleShowLayout,
@@ -17,7 +18,15 @@ const LessonShow = (props) => (
       <TextField source="assignment" label="Задание" />
       <TextField source="homework" label="Домашнее задание" />
       <BooleanField source="isActual" label="Актуально" />
-      <TextField source="student" label="Ученик" />
+      <FunctionField
+        label="Ученик"
+        render={record =>
+          record.student
+            ? `${record.student.lastName || ''} ${record.student.firstName || ''} ${record.student.middleName || ''}`.trim()
+            : ''
+        }
+      />
+      <TextField source="student.firstName " label="Ученик" />
       <TextField source="teacher" label="Учитель" />
     </SimpleShowLayout>
   </Show>
