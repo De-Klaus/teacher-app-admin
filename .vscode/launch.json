@@ -4,12 +4,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Rebuild & Start + Open Browser",
+      "name": "Rebuild & Start",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "rebuild-start"],
       "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "postDebugTask": "Open Browser"
+      "console": "integratedTerminal"
     }
   ]
 }

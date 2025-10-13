@@ -1,15 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import './App.css';
 import { useTranslate } from 'react-admin';
 import { Admin, Resource } from 'react-admin';
 import { Link } from 'react-router-dom';
-import { Box, Card, CardContent, Tabs, Tab, TextField, Button, Typography, InputAdornment } from '@mui/material';
+import { Box, Card, CardContent, Tabs, Tab, TextField, Button, Typography, InputAdornment, CircularProgress } from '@mui/material';
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
 import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import { useState } from 'react';
 import { useLogin, fetchUtils } from 'react-admin';
 import { API_URL } from './config';
 import { CustomRoutes } from 'react-admin';
@@ -19,6 +18,7 @@ import authProvider from './authProvider';
 import i18nProvider from './i18nProvider';
 import CustomLayout from './CustomLayout';
 import Dashboard from './Dashboard';
+import LoginRedirect from './LoginRedirect';
 
 import CalendarPage from './calendar/CalendarPage';
 
@@ -161,50 +161,105 @@ const LoginPage = () => {
   );
 };
 
-const App = () => (
-  <Admin 
-    dashboard={Dashboard} 
-    dataProvider={dataProvider} 
-    authProvider={authProvider}
-    layout={CustomLayout}
-    i18nProvider={i18nProvider}
-    loginPage={LoginPage}
-  >
-    <CustomRoutes>
-      <Route path="/calendar" element={<CalendarPage />} />
-    </CustomRoutes>
-    <Resource
-        name="students"
-        options={{ label: 'resources.students.name' }}
-        list={StudentList}
-        create={StudentCreate}
-        edit={StudentEdit}
-        show={StudentShow}
-    />
-    <Resource
-        name="teachers"
-        list={TeacherList}
-        create={TeacherCreate}
-        edit={TeacherEdit}
-        show={TeacherShow}
-    />
-    <Resource 
-          name="tariffs" 
-          list={TariffList} 
-          create={TariffCreate} 
-          edit={TariffEdit} 
-          show={TariffShow} />
-    <Resource
-        name="lessons"
-        list={LessonList}
-        create={LessonCreate}
-        edit={LessonEdit}
-        show={LessonShow} />
-    <Resource
-        name="users"
-        create={UserCreate}
-    />
-  </Admin>
-);
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp * 1000 > Date.now()) {
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_refresh_token');
+          setIsAuthenticated(false);
+        }
+      } catch (e) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_refresh_token');
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Show loading while checking
+  if (isAuthenticated === null) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        flexDirection: 'column',
+        background: 'linear-gradient(135deg, #0f1021 0%, #1a1c3c 40%, #0b1026 100%)'
+      }}>
+        <CircularProgress sx={{ color: '#6366f1', mb: 2 }} />
+        <Typography variant="h6" sx={{ color: '#e5e7eb' }}>Проверка аутентификации...</Typography>
+      </Box>
+    );
+  }
+
+  // Show login redirect if not authenticated
+  if (!isAuthenticated) {
+    return <LoginRedirect />;
+  }
+
+  // Show main app if authenticated
+  return (
+    <Admin 
+      dashboard={Dashboard} 
+      dataProvider={dataProvider} 
+      authProvider={authProvider}
+      layout={CustomLayout}
+      i18nProvider={i18nProvider}
+      loginPage={LoginPage}
+    >
+      <CustomRoutes>
+        <Route path="/calendar" element={<CalendarPage />} />
+      </CustomRoutes>
+      <Resource
+          name="students"
+          options={{ label: 'resources.students.name' }}
+          list={StudentList}
+          create={StudentCreate}
+          edit={StudentEdit}
+          show={StudentShow}
+      />
+      <Resource
+          name="teachers"
+          list={TeacherList}
+          create={TeacherCreate}
+          edit={TeacherEdit}
+          show={TeacherShow}
+      />
+      <Resource 
+            name="tariffs" 
+            list={TariffList} 
+            create={TariffCreate} 
+            edit={TariffEdit} 
+            show={TariffShow} />
+      <Resource
+          name="lessons"
+          list={LessonList}
+          create={LessonCreate}
+          edit={LessonEdit}
+          show={LessonShow} />
+      <Resource
+          name="users"
+          create={UserCreate}
+      />
+    </Admin>
+  );
+};
 
 export default App;
