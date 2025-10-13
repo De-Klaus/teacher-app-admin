@@ -5,29 +5,26 @@ import {
   SimpleShowLayout,
   TextField,
   DateField,
-  BooleanField,
+  NumberField,
+  ReferenceField,
 } from 'react-admin';
 
 const LessonShow = (props) => (
   <Show {...props}>
     <SimpleShowLayout>
       <TextField source="id" label="ID" />
-      <DateField source="lessonDate" label="Дата урока" />
-      <TextField source="topic" label="Тема" />
-      <TextField source="links" label="Ссылки" />
-      <TextField source="assignment" label="Задание" />
+      <DateField source="scheduledAt" label="Дата/время" showTime />
+      <NumberField source="durationMinutes" label="Длительность, мин" />
+      <NumberField source="price" label="Цена" />
+      <TextField source="status" label="Статус" />
       <TextField source="homework" label="Домашнее задание" />
-      <BooleanField source="isActual" label="Актуально" />
-      <FunctionField
-        label="Ученик"
-        render={record =>
-          record.student
-            ? `${record.student.lastName || ''} ${record.student.firstName || ''} ${record.student.middleName || ''}`.trim()
-            : ''
-        }
-      />
-      <TextField source="student.firstName " label="Ученик" />
-      <TextField source="teacher" label="Учитель" />
+      <TextField source="feedback" label="Отзыв" />
+      <ReferenceField source="studentId" reference="students" label="Ученик" link={false}>
+        <FunctionField render={r => `${r.lastName || ''} ${r.firstName || ''}`.trim()} />
+      </ReferenceField>
+      <ReferenceField source="teacherId" reference="teachers" label="Учитель" link={false}>
+        <FunctionField render={r => `${r.lastName || ''} ${r.firstName || ''}`.trim()} />
+      </ReferenceField>
     </SimpleShowLayout>
   </Show>
 );

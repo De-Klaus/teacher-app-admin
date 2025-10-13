@@ -1,13 +1,13 @@
 import React from 'react';
-import { Edit, SimpleForm, TextInput, ReferenceInput, SelectInput } from 'react-admin';
+import { Edit, SimpleForm, TextInput } from 'react-admin';
 
 const TeacherEdit = (props) => (
     <Edit {...props}>
         <SimpleForm>
-            <TextInput source="name" />
-            <ReferenceInput source="user.id" reference="users">
-                <SelectInput optionText="username" />
-            </ReferenceInput>
+            <TextInput source="id" label="ID" disabled />
+            <TextInput source="userId" label="User ID" />
+            <TextInput source="subject" label="Subject" />
+            <TextInput source="timeZone" label="Time Zone" />
         </SimpleForm>
     </Edit>
 );

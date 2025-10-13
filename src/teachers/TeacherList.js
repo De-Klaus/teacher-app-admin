@@ -1,13 +1,13 @@
 import React from 'react';
-import { List, Datagrid, TextField, ReferenceField, EditButton, ShowButton } from 'react-admin';
+import { List, Datagrid, TextField, EditButton, ShowButton } from 'react-admin';
 
 const TeacherList = (props) => (
     <List {...props}>
         <Datagrid rowClick="show">
-            <TextField source="name" />
-            <ReferenceField source="user.id" reference="users">
-                <TextField source="username" />
-            </ReferenceField>
+            <TextField source="id" label="ID" />
+            <TextField source="userId" label="User ID" />
+            <TextField source="subject" label="Subject" />
+            <TextField source="timeZone" label="Time Zone" />
             <EditButton />
             <ShowButton />
         </Datagrid>

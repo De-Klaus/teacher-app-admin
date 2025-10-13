@@ -4,17 +4,14 @@ import { Edit, SimpleForm, TextInput, DateInput, NumberInput } from 'react-admin
 const StudentEdit = () => (
   <Edit>
     <SimpleForm>
-      <TextInput source="firstName" />
-      <TextInput source="lastName" />
-      <TextInput source="middleName" />
-      <TextInput source="city" />
-      <DateInput source="birthDate" />
-      <TextInput source="timeZone" />
-      <TextInput source="platform" />
-      <DateInput source="createdAt" />
-      <NumberInput source="schoolStartYear" />
-      <NumberInput source="currentGrade" />
-      <TextInput source="teacherId.id" label="Teacher ID" />
+      <TextInput source="id" label="ID" disabled />
+      <TextInput source="userId" label="User ID" />
+      <DateInput source="birthDate" label="Birth Date" />
+      <TextInput source="phoneNumber" label="Phone" />
+      <TextInput source="city" label="City" />
+      <TextInput source="timeZone" label="Time Zone" />
+      <NumberInput source="grade" label="Grade" />
+      <TextInput source="school" label="School" />
     </SimpleForm>
   </Edit>
 );

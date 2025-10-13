@@ -59,9 +59,27 @@ const authProvider = {
 
     // Called when the user navigates, to check for authentication
     checkAuth: () => {
-        return localStorage.getItem(AUTH_TOKEN_KEY)
-            ? Promise.resolve()
-            : Promise.reject();
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (!token) {
+            return Promise.reject();
+        }
+        
+        // Check if token is expired
+        const payload = decodeJwtPayload(token);
+        if (!payload || !payload.exp) {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
+            return Promise.reject();
+        }
+        
+        // Check if token is expired (exp is in seconds, Date.now() is in milliseconds)
+        if (payload.exp * 1000 < Date.now()) {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
+            return Promise.reject();
+        }
+        
+        return Promise.resolve();
     },
 
     // Optional: get user permissions/roles

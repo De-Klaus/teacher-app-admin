@@ -1,26 +1,15 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "node",
-        "request": "launch",
-        "name": "Rebuild & Start + Open Browser",
-        "runtimeExecutable": "npm",
-        "runtimeArgs": ["run", "rebuild-start"],
-        "cwd": "${workspaceFolder}",
-        "console": "integratedTerminal",
-        "postDebugTask": "Open Browser"
-      }
-    ],
-    "tasks": {
-      "version": "2.0.0",
-      "tasks": [
-        {
-          "label": "Open Browser",
-          "type": "shell",
-          "command": "start http://localhost:3000",
-          "problemMatcher": []
-        }
-      ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Rebuild & Start + Open Browser",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "rebuild-start"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "postDebugTask": "Open Browser"
     }
-  }
+  ]
+}

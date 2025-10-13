@@ -36,3 +36,103 @@
     transform: rotate(360deg);
   }
 }
+
+/* --- Futuristic auth page styling --- */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px) scale(1); }
+  50% { transform: translateY(-20px) translateX(10px) scale(1.03); }
+  100% { transform: translateY(0px) translateX(0px) scale(1); }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0px rgba(99, 102, 241, 0.0), 0 0 0px rgba(16, 185, 129, 0.0); }
+  50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.25), 0 0 60px rgba(16, 185, 129, 0.12); }
+  100% { box-shadow: 0 0 0px rgba(99, 102, 241, 0.0), 0 0 0px rgba(16, 185, 129, 0.0); }
+}
+
+.auth-bg {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f1021 0%, #1a1c3c 40%, #0b1026 100%);
+}
+
+.auth-bg::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(1200px 600px at 20% 10%, rgba(59,130,246,0.15), transparent 60%),
+              radial-gradient(900px 500px at 80% 20%, rgba(16,185,129,0.12), transparent 55%),
+              radial-gradient(700px 500px at 50% 80%, rgba(168,85,247,0.10), transparent 60%),
+              linear-gradient(120deg, rgba(99,102,241,0.12), rgba(16,185,129,0.08));
+  filter: blur(40px);
+  animation: gradientShift 18s ease infinite;
+  background-size: 200% 200%;
+}
+
+.blob {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.35;
+  animation: float 10s ease-in-out infinite;
+}
+
+.blob--blue { background: radial-gradient(circle at 30% 30%, #6366f1, transparent 60%); top: -60px; left: -80px; }
+.blob--green { background: radial-gradient(circle at 70% 70%, #10b981, transparent 60%); bottom: -80px; right: -60px; animation-duration: 12s; }
+.blob--purple { background: radial-gradient(circle at 70% 30%, #a855f7, transparent 60%); top: 20%; right: 20%; animation-duration: 14s; }
+
+.glass-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,255,255,0.08);
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.neon-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+  color: #0b1026 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px;
+  border-radius: 12px !important;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.neon-btn:hover {
+  transform: translateY(-1px) scale(1.01);
+  filter: brightness(1.05);
+}
+
+.futuristic-input .MuiInputBase-root {
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+}
+
+.futuristic-input .MuiInputBase-root:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.futuristic-input .Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(99,102,241,0.6);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.tab-indicator {
+  background: linear-gradient(90deg, #6366f1, #10b981) !important;
+  height: 4px !important;
+  border-radius: 4px;
+}

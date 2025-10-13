@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Edit,
+  Create,
   SimpleForm,
   TextInput,
   DateTimeInput,
@@ -11,10 +11,9 @@ import {
   required,
 } from 'react-admin';
 
-const LessonEdit = (props) => (
-  <Edit {...props}>
+const LessonCreate = (props) => (
+  <Create {...props}>
     <SimpleForm>
-      <TextInput source="id" label="ID" disabled />
       <ReferenceInput source="studentId" reference="students" label="Ученик" validate={[required()]}>
         <AutocompleteInput optionText={(r) => `${r.lastName || ''} ${r.firstName || ''}`.trim()} />
       </ReferenceInput>
@@ -37,7 +36,9 @@ const LessonEdit = (props) => (
       <TextInput source="homework" label="Домашнее задание" multiline />
       <TextInput source="feedback" label="Отзыв" multiline />
     </SimpleForm>
-  </Edit>
+  </Create>
 );
 
-export default LessonEdit;
+export default LessonCreate;
+
+

@@ -15,6 +15,12 @@ export default {
       user_menu: 'Профиль',
     },
   },
+  app: {
+    name: 'Умная платформа для учителей и учеников',
+  },
+  errors: {
+    server_access_denied: 'Ошибка сервера: Доступ запрещён. Пожалуйста, попробуйте позже или обратитесь в поддержку.',
+  },
   resources: {
     students: {
       name: 'Ученик |||| Ученики',
@@ -36,6 +42,7 @@ export default {
     dashboard: 'Главная',
     calendar: 'Календарь',
     lesson: 'Уроки',
+    registerUser: 'Регистрация пользователя',
   },
   page: {
     dashboard: 'Добро пожаловать',

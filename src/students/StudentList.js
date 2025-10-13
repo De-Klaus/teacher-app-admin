@@ -4,7 +4,7 @@ import {
     Datagrid, 
     TextField, 
     DateField, 
-    ReferenceField, 
+    NumberField,
     ShowButton, 
     EditButton, 
     DeleteButton } from 'react-admin';
@@ -12,11 +12,14 @@ import {
 const StudentList = () => (
   <List>
     <Datagrid rowClick="show">
-      <TextField source="firstName" />
-      <TextField source="lastName" />
-      <TextField source="city" />
-      <DateField source="birthDate" />
-      <TextField source="platform" />
+      <TextField source="id" label="ID" />
+      <TextField source="userId" label="User ID" />
+      <DateField source="birthDate" label="Birth Date" />
+      <TextField source="phoneNumber" label="Phone" />
+      <TextField source="city" label="City" />
+      <TextField source="timeZone" label="Time Zone" />
+      <NumberField source="grade" label="Grade" />
+      <TextField source="school" label="School" />
       <EditButton />
       <ShowButton />
       <DeleteButton />

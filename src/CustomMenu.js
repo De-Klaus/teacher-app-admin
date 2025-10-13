@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import BookIcon from '@mui/icons-material/Book';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import EventIcon from '@mui/icons-material/Event';
 import SchoolIcon from '@mui/icons-material/School';
 
@@ -23,13 +24,17 @@ const CustomMenu = () => {
         to="/students"
         primaryText={translate('resources.students.name')}
         leftIcon={<PeopleIcon />}
-        isSelected={location.pathname.startsWith('/students')}
       />
       <MenuItemLink
         to="/teachers"
         primaryText={translate('resources.teachers.name')}
         leftIcon={<PeopleIcon />}
-        isSelected={location.pathname.startsWith('/teachers')}
+      />
+
+      <MenuItemLink
+        to="/users/create"
+        primaryText={translate('menu.registerUser') || 'Register User'}
+        leftIcon={<PersonAddAltIcon />}
       />
 
       <h4 style={{ padding: '0 1em', marginTop: '1em' }}>
@@ -39,19 +44,16 @@ const CustomMenu = () => {
         to="/tariffs"
         primaryText={translate('resources.tariffs.name')}
         leftIcon={<BookIcon />}
-        isSelected={location.pathname.startsWith('/tariffs')}
       />
       <MenuItemLink
         to="/calendar"
         primaryText={translate('menu.calendar')}
         leftIcon={<EventIcon />}
-        isSelected={location.pathname.startsWith('/calendar')}
       />
       <MenuItemLink
         to="/lessons"
         primaryText={translate('menu.lesson')}
         leftIcon={<SchoolIcon />}
-        isSelected={location.pathname.startsWith('/lessons')}
       />
 
       <h4 style={{ padding: '0 1em', marginTop: '1em' }}>
@@ -61,7 +63,6 @@ const CustomMenu = () => {
         to="/settings"
         primaryText={translate('menu.settings')}
         leftIcon={<SettingsIcon />}
-        isSelected={location.pathname.startsWith('/settings')}
       />
     </Menu>
   );

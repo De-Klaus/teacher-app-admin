@@ -1,13 +1,13 @@
 import React from 'react';
-import { Show, SimpleShowLayout, TextField, ReferenceField } from 'react-admin';
+import { Show, SimpleShowLayout, TextField } from 'react-admin';
 
 const TeacherShow = (props) => (
     <Show {...props}>
         <SimpleShowLayout>
-            <TextField source="name" />
-            <ReferenceField source="user.id" reference="users">
-                <TextField source="username" />
-            </ReferenceField>
+            <TextField source="id" label="ID" />
+            <TextField source="userId" label="User ID" />
+            <TextField source="subject" label="Subject" />
+            <TextField source="timeZone" label="Time Zone" />
         </SimpleShowLayout>
     </Show>
 );
