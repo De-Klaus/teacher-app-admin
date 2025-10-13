@@ -42,6 +42,7 @@ export default {
     dashboard: 'Главная',
     calendar: 'Календарь',
     lesson: 'Уроки',
+    lessonWork: 'Работа с уроками',
     registerUser: 'Регистрация пользователя',
   },
   page: {

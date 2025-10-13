@@ -37,7 +37,7 @@
   }
 }
 
-/* --- Futuristic auth page styling --- */
+/* --- Futuristic app styling --- */
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -56,6 +56,29 @@
   100% { box-shadow: 0 0 0px rgba(99, 102, 241, 0.0), 0 0 0px rgba(16, 185, 129, 0.0); }
 }
 
+/* Global app background */
+body, #root {
+  background: linear-gradient(135deg, #0f1021 0%, #1a1c3c 40%, #0b1026 100%);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif';
+}
+
+/* Add keyframes for animations */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px) scale(1); }
+  50% { transform: translateY(-20px) translateX(10px) scale(1.03); }
+  100% { transform: translateY(0px) translateX(0px) scale(1); }
+}
+
+/* Auth page background */
 .auth-bg {
   min-height: 100vh;
   width: 100%;
@@ -80,6 +103,7 @@
   background-size: 200% 200%;
 }
 
+/* Floating blobs */
 .blob {
   position: absolute;
   width: 420px;
@@ -94,6 +118,7 @@
 .blob--green { background: radial-gradient(circle at 70% 70%, #10b981, transparent 60%); bottom: -80px; right: -60px; animation-duration: 12s; }
 .blob--purple { background: radial-gradient(circle at 70% 30%, #a855f7, transparent 60%); top: 20%; right: 20%; animation-duration: 14s; }
 
+/* Glass card effect */
 .glass-card {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -103,6 +128,7 @@
   animation: pulseGlow 6s ease-in-out infinite;
 }
 
+/* Neon button styling */
 .neon-btn {
   background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
   color: #0b1026 !important;
@@ -117,6 +143,7 @@
   filter: brightness(1.05);
 }
 
+/* Futuristic input styling */
 .futuristic-input .MuiInputBase-root {
   border-radius: 12px;
   background: rgba(255,255,255,0.04);
@@ -131,8 +158,137 @@
   box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
+/* Tab indicator */
 .tab-indicator {
   background: linear-gradient(90deg, #6366f1, #10b981) !important;
   height: 4px !important;
   border-radius: 4px;
+}
+
+/* React Admin theme overrides */
+.ra-layout {
+  background: linear-gradient(135deg, #0f1021 0%, #1a1c3c 40%, #0b1026 100%) !important;
+  min-height: 100vh;
+}
+
+.ra-layout-header {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.ra-layout-sidebar {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ra-layout-main {
+  background: transparent !important;
+}
+
+/* Card styling */
+.ra-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+}
+
+/* Button styling */
+.ra-button {
+  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%) !important;
+  color: #0b1026 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  transition: transform 0.15s ease, filter 0.15s ease !important;
+}
+
+.ra-button:hover {
+  transform: translateY(-1px) scale(1.01) !important;
+  filter: brightness(1.05) !important;
+}
+
+/* Table styling */
+.ra-table {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.ra-table th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #e5e7eb !important;
+  font-weight: 700 !important;
+}
+
+.ra-table td {
+  color: #e5e7eb !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Form styling */
+.ra-form {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px !important;
+  padding: 24px !important;
+}
+
+/* Text colors */
+.ra-text {
+  color: #e5e7eb !important;
+}
+
+.ra-title {
+  color: #e5e7eb !important;
+  font-weight: 700 !important;
+}
+
+/* Input styling */
+.ra-input .MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: #e5e7eb !important;
+}
+
+.ra-input .MuiInputBase-root:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.ra-input .Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(99,102,241,0.6) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+}
+
+/* Menu styling */
+.ra-menu {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.ra-menu-item {
+  color: #e5e7eb !important;
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ra-menu-item:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+  transform: translateX(4px) !important;
+}
+
+.ra-menu-item.active {
+  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%) !important;
+  color: #0b1026 !important;
+  font-weight: 700 !important;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { AUTH_TOKEN_KEY } from '../config';
 
-const PublicRoute = ({ children }) => {
+const AuthGuard = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,14 +61,14 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  // Если авторизован, редиректим на главную страницу
-  if (isAuthenticated) {
-    window.location.href = '/';
+  // Если не авторизован, редиректим на /login
+  if (!isAuthenticated) {
+    window.location.href = '/login';
     return null;
   }
 
-  // Если не авторизован, показываем содержимое (например, страницу логина)
+  // Если авторизован, показываем содержимое
   return children;
 };
 
-export default PublicRoute;
+export default AuthGuard;

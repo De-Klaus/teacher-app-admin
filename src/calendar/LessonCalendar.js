@@ -11,13 +11,19 @@ import {
   TextField,
   Button,
   MenuItem,
+  Box,
+  Typography,
+  Card,
+  CardContent,
 } from '@mui/material';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './CalendarStyles.css';
 import { useNotify, useRedirect, useCreate, useDataProvider } from 'react-admin';
+import FuturisticBackground from '../components/FuturisticBackground';
 
 const locales = {
   ru: require('date-fns/locale/ru'),
@@ -164,81 +170,231 @@ const LessonCalendar = ({ initialLessons = [] }) => {
   };
 
   return (
-    <div style={{ height: '80vh', padding: '1em' }}>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        selectable
-        onSelectEvent={handleSelectEvent}
-        onSelectSlot={handleSelectSlot}
-        messages={{
-          next: '→',
-          previous: '←',
-          today: 'Сегодня',
-          month: 'Месяц',
-          week: 'Неделя',
-          day: 'День',
-        }}
-        style={{ height: '100%' }}
-        views={['month', 'week', 'day']}
-        eventPropGetter={(event) => ({
-          style: {
-            backgroundColor: event.backgroundColor,
-            color: '#000',
-          },
-        })}
-      />
+    <FuturisticBackground>
+      <Box sx={{ 
+        height: '80vh', 
+        padding: '2em',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <Card sx={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '16px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          height: '100%',
+          overflow: 'hidden'
+        }}>
+          <CardContent sx={{ height: '100%', padding: 0 }}>
+            <Box sx={{ 
+              padding: '1em',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.05)'
+            }}>
+              <Typography variant="h5" sx={{ 
+                color: '#e5e7eb', 
+                fontWeight: 700,
+                textAlign: 'center'
+              }}>
+                📅 Календарь уроков
+              </Typography>
+            </Box>
+            <Box sx={{ height: 'calc(100% - 80px)', padding: '1em' }}>
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                selectable
+                onSelectEvent={handleSelectEvent}
+                onSelectSlot={handleSelectSlot}
+                messages={{
+                  next: '→',
+                  previous: '←',
+                  today: 'Сегодня',
+                  month: 'Месяц',
+                  week: 'Неделя',
+                  day: 'День',
+                }}
+                style={{ 
+                  height: '100%',
+                  color: '#e5e7eb'
+                }}
+                views={['month', 'week', 'day']}
+                eventPropGetter={(event) => ({
+                  style: {
+                    backgroundColor: event.backgroundColor,
+                    color: '#000',
+                    borderRadius: '8px',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  },
+                })}
+              />
+            </Box>
+          </CardContent>
+        </Card>
 
-      <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-        <DialogTitle>Добавить урок</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Тема"
-            value={formData.topic}
-            onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Ученик"
-            select
-            value={formData.student}
-            onChange={(e) => setFormData({ ...formData, student: e.target.value })}
-            fullWidth
-            margin="normal"
-          >
-            {students.map((student) => (
-              <MenuItem key={student.id} value={student.id}>
-                {student.firstName} {student.middleName} {student.lastName}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="Время"
-            type="time"
-            value={formData.time || ''}
-            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-            fullWidth
-            margin="normal"
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            Сохранить
-          </Button>
-          <Button onClick={() => setModalOpen(false)} variant="outlined">
-            Отмена
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+        <Dialog 
+          open={modalOpen} 
+          onClose={() => setModalOpen(false)}
+          PaperProps={{
+            sx: {
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '16px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            color: '#e5e7eb', 
+            fontWeight: 700,
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            ✨ Добавить урок
+          </DialogTitle>
+          <DialogContent sx={{ padding: '2em' }}>
+            <TextField
+              label="Тема"
+              value={formData.topic}
+              onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{
+                '& .MuiInputBase-root': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  color: '#e5e7eb',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#e5e7eb',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.5)',
+                },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.6)',
+                  boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                },
+              }}
+            />
+            <TextField
+              label="Ученик"
+              select
+              value={formData.student}
+              onChange={(e) => setFormData({ ...formData, student: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{
+                '& .MuiInputBase-root': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  color: '#e5e7eb',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#e5e7eb',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.5)',
+                },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.6)',
+                  boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                },
+              }}
+            >
+              {students.map((student) => (
+                <MenuItem key={student.id} value={student.id} sx={{ color: '#e5e7eb' }}>
+                  {student.firstName} {student.middleName} {student.lastName}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              label="Время"
+              type="time"
+              value={formData.time || ''}
+              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              fullWidth
+              margin="normal"
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  color: '#e5e7eb',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#e5e7eb',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.5)',
+                },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(99, 102, 241, 0.6)',
+                  boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                },
+              }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ 
+            padding: '1em 2em',
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <Button 
+              onClick={handleSubmit} 
+              variant="contained" 
+              sx={{
+                background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
+                color: '#0b1026',
+                fontWeight: 700,
+                borderRadius: '12px',
+                '&:hover': {
+                  transform: 'translateY(-1px) scale(1.01)',
+                  filter: 'brightness(1.05)',
+                },
+              }}
+            >
+              ✨ Сохранить
+            </Button>
+            <Button 
+              onClick={() => setModalOpen(false)} 
+              variant="outlined"
+              sx={{
+                color: '#e5e7eb',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: '12px',
+                '&:hover': {
+                  background: 'rgba(99, 102, 241, 0.2)',
+                  borderColor: 'rgba(99, 102, 241, 0.5)',
+                },
+              }}
+            >
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </FuturisticBackground>
   );
 };
 

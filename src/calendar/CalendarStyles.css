@@ -1,0 +1,197 @@
+/* Футуристические стили для календаря */
+.rbc-calendar {
+  background: transparent !important;
+  color: #e5e7eb !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Заголовок календаря */
+.rbc-toolbar {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 1em !important;
+  margin-bottom: 1em !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.rbc-toolbar-label {
+  color: #e5e7eb !important;
+  font-weight: 700 !important;
+  font-size: 1.2em !important;
+}
+
+.rbc-btn-group button {
+  background: rgba(99, 102, 241, 0.2) !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  color: #e5e7eb !important;
+  border-radius: 8px !important;
+  margin: 0 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.rbc-btn-group button:hover {
+  background: rgba(99, 102, 241, 0.4) !important;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+.rbc-btn-group button.rbc-active {
+  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%) !important;
+  color: #0b1026 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Навигация */
+.rbc-toolbar button {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #e5e7eb !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.rbc-toolbar button:hover {
+  background: rgba(99, 102, 241, 0.3) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Сетка календаря */
+.rbc-month-view,
+.rbc-time-view {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  overflow: hidden !important;
+}
+
+/* Заголовки дней */
+.rbc-header {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #e5e7eb !important;
+  font-weight: 600 !important;
+  padding: 12px 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ячейки дней */
+.rbc-date-cell {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+.rbc-off-range-bg {
+  background: rgba(107, 114, 128, 0.1) !important;
+}
+
+.rbc-today {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border: 2px solid rgba(99, 102, 241, 0.3) !important;
+}
+
+/* События */
+.rbc-event {
+  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%) !important;
+  color: #0b1026 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.rbc-event:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.rbc-event-content {
+  color: #0b1026 !important;
+  font-weight: 600 !important;
+}
+
+/* Временные метки */
+.rbc-time-header-content {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.rbc-time-slot {
+  color: #9ca3af !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.rbc-timeslot-group {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Текущее время */
+.rbc-current-time-indicator {
+  background: linear-gradient(90deg, #ef4444 0%, #f97316 100%) !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+}
+
+/* Выделение ячеек */
+.rbc-selected {
+  background: rgba(99, 102, 241, 0.2) !important;
+  border: 2px solid rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Скроллбар */
+.rbc-time-view::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.rbc-time-view::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+.rbc-time-view::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5) !important;
+  border-radius: 4px !important;
+}
+
+.rbc-time-view::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7) !important;
+}
+
+/* Анимации */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.rbc-event.rbc-selected {
+  animation: pulse 2s infinite !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
+  .rbc-toolbar button {
+    font-size: 0.9em !important;
+    padding: 6px 10px !important;
+  }
+  
+  .rbc-header {
+    font-size: 0.8em !important;
+    padding: 8px 4px !important;
+  }
+  
+  .rbc-event {
+    font-size: 0.8em !important;
+    padding: 2px 4px !important;
+  }
+}

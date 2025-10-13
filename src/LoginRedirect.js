@@ -5,45 +5,24 @@ import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import { fetchUtils } from 'react-admin';
+import { useLogin, fetchUtils } from 'react-admin';
 import { API_URL } from './config';
 import './App.css';
 
 const LoginRedirect = () => {
+  const login = useLogin();
   const [tab, setTab] = useState(0);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const customLogin = async (email, password) => {
-    const response = await fetchUtils.fetchJson(`${API_URL}/auth/sign-in`, {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: new Headers({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-      }),
-    });
-    const { token, refreshToken } = response.json;
-    if (token) {
-      localStorage.setItem('auth_token', token);
-      if (refreshToken) {
-        localStorage.setItem('auth_refresh_token', refreshToken);
-      }
-      // Reload the page to trigger authentication check
-      window.location.reload();
-    } else {
-      throw new Error('No token received');
-    }
-  };
-
   const onLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await customLogin(loginForm.email, loginForm.password);
+      await login({ username: loginForm.email, password: loginForm.password });
     } catch (e) {
       setError('Invalid credentials');
     } finally {
@@ -69,7 +48,7 @@ const LoginRedirect = () => {
       });
       // After successful registration, automatically log in the user
       try {
-        await customLogin(registerForm.email, registerForm.password);
+        await login({ username: registerForm.email, password: registerForm.password });
         // Clear forms
         setRegisterForm({ firstName: '', lastName: '', email: '', password: '' });
         setLoginForm({ email: '', password: '' });
