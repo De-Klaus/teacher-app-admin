@@ -225,6 +225,7 @@ const App = () => {
       loginPage={LoginPage}
     >
       <CustomRoutes>
+        <Route path="/login" element={<LoginRedirect />} />
         <Route path="/calendar" element={<CalendarPage />} />
       </CustomRoutes>
       <Resource
