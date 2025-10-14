@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import './App.css';
 import { Admin, Resource, CustomRoutes } from 'react-admin';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -41,95 +41,47 @@ import LessonEdit from './lesson/LessonEdit';
 import LessonShow from './lesson/LessonShow';
 import UserCreate from './users/UserCreate';
 
-// Создаём QueryClient для React Query
 const queryClient = new QueryClient();
 
-const App = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <AppErrorBoundary>
-              <Routes>
-                {/* Публичные маршруты */}
-                <Route
-                  path="/login"
-                  element={
-                    <PublicRoute>
-                      <LoginRedirect />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <PublicRoute>
-                      <RegisterPage />
-                    </PublicRoute>
-                  }
-                />
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppErrorBoundary>
+            <Routes>
+              <Route path="/login" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+              <Route path="/*" element={
+                <RequireAuth>
+    <Admin 
+      dashboard={Dashboard} 
+      dataProvider={dataProvider} 
+      authProvider={authProvider}
+      layout={CustomLayout}
+      i18nProvider={i18nProvider}
+                    loginPage={false}
+    >
+      <CustomRoutes>
+        <Route path="/calendar" element={<CalendarPage />} />
+                      <Route path="/lesson-work" element={<LessonWorkPage />} />
+      </CustomRoutes>
 
-                {/* Все остальные маршруты — защищены */}
-                <Route
-                  path="/*"
-                  element={
-                    <RequireAuth>
-                      <Admin
-                        dashboard={Dashboard}
-                        dataProvider={dataProvider}
-                        authProvider={authProvider}
-                        layout={CustomLayout}
-                        i18nProvider={i18nProvider}
-                        loginPage={LoginRedirect}
-                      >
-                        <CustomRoutes>
-                          <Route path="/calendar" element={<CalendarPage />} />
-                          <Route path="/lesson-work" element={<LessonWorkPage />} />
-                        </CustomRoutes>
-
-                        <Resource
-                          name="students"
-                          options={{ label: 'resources.students.name' }}
-                          list={StudentList}
-                          create={StudentCreate}
-                          edit={StudentEdit}
-                          show={StudentShow}
-                        />
-                        <Resource
-                          name="teachers"
-                          list={TeacherList}
-                          create={TeacherCreate}
-                          edit={TeacherEdit}
-                          show={TeacherShow}
-                        />
-                        <Resource
-                          name="tariffs"
-                          list={TariffList}
-                          create={TariffCreate}
-                          edit={TariffEdit}
-                          show={TariffShow}
-                        />
-                        <Resource
-                          name="lessons"
-                          list={LessonList}
-                          create={LessonCreate}
-                          edit={LessonEdit}
-                          show={LessonShow}
-                        />
-                        <Resource name="users" create={UserCreate} />
-                      </Admin>
-                    </RequireAuth>
-                  }
-                />
-              </Routes>
-            </AppErrorBoundary>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
-  );
-};
+                    <Resource name="students" list={StudentList} create={StudentCreate} edit={StudentEdit} show={StudentShow} />
+                    <Resource name="teachers" list={TeacherList} create={TeacherCreate} edit={TeacherEdit} show={TeacherShow} />
+                    <Resource name="tariffs" list={TariffList} create={TariffCreate} edit={TariffEdit} show={TariffShow} />
+                    <Resource name="lessons" list={LessonList} create={LessonCreate} edit={LessonEdit} show={LessonShow} />
+                    <Resource name="users" create={UserCreate} />
+    </Admin>
+                </RequireAuth>
+              } />
+            </Routes>
+          </AppErrorBoundary>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </ThemeProvider>
+);
 
 export default App;

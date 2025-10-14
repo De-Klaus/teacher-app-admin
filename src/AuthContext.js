@@ -1,22 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { authService } from './authService';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = authService.getToken();
-    if (token && authService.isTokenValid(token)) {
-      setUser({ token });
-    } else {
-      authService.removeToken();
-      setUser(null);
-    }
-    setLoading(false);
-  }, []);
+  const token = authService.getToken();
+  const initialUser = token && authService.isTokenValid(token) ? { token } : null;
+  if (!initialUser && token) {
+    authService.removeToken();
+  }
+  const [user, setUser] = useState(initialUser);
+  const [loading] = useState(false);
 
   const login = (token) => {
     authService.setToken(token);
@@ -36,5 +30,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-
-
