@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { Menu, MenuItemLink, useTranslate } from 'react-admin';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import { Box, Typography, Divider } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import BookIcon from '@mui/icons-material/Book';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import EventIcon from '@mui/icons-material/Event';
 import SchoolIcon from '@mui/icons-material/School';
@@ -12,6 +15,8 @@ import WorkIcon from '@mui/icons-material/Work';
 
 const CustomMenu = () => {
   const translate = useTranslate();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   return (
     <Box sx={{
@@ -295,6 +300,33 @@ const CustomMenu = () => {
                 borderColor: 'rgba(107, 114, 128, 0.3)',
                 transform: 'translateX(4px)',
                 boxShadow: '0 4px 12px rgba(107, 114, 128, 0.2)',
+              },
+            }}
+          />
+
+          <MenuItemLink
+            to="/login"
+            onClick={(e) => {
+              e.preventDefault();
+              logout();
+              navigate('/login', { replace: true });
+            }}
+            primaryText={translate('ra.auth.logout')}
+            leftIcon={<LogoutIcon sx={{ color: '#ef4444' }} />}
+            sx={{
+              color: '#e5e7eb',
+              fontWeight: 500,
+              padding: '10px 1em',
+              margin: '2px 0',
+              borderRadius: '8px',
+              background: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                background: 'rgba(239, 68, 68, 0.2)',
+                borderColor: 'rgba(239, 68, 68, 0.35)',
+                transform: 'translateX(4px)',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)',
               },
             }}
           />
