@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "jwt-decode": "^4.0.0",
     "ra-data-hal": "^2.7.1",
     "ra-data-simple-rest": "^5.7.3",
     "ra-language-russian": "^5.4.3",

@@ -97,5 +97,3 @@ const authProvider = {
 };
 
 export default authProvider;
-
-

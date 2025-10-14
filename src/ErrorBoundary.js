@@ -1,10 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Alert, Box, Typography, Button } from '@mui/material';
-import { useTranslate } from 'react-admin';
 
 const ErrorBoundary = ({ error, resetError }) => {
-  const translate = useTranslate();
-
+  const navigate = useNavigate();
   const getErrorTitle = (errorMessage) => {
     if (errorMessage.includes('Access denied')) {
       return 'Access Denied';
@@ -41,7 +40,7 @@ const ErrorBoundary = ({ error, resetError }) => {
         <Button 
           variant="contained" 
           color="primary" 
-          onClick={() => window.location.href = '/login'}
+          onClick={() => navigate('/login', { replace: true })}
           sx={{ mt: 2 }}
         >
           Go to Login
