@@ -18,6 +18,7 @@ import PublicRoute from './components/PublicRoute';
 import RegisterPage from './auth/RegisterPage';
 import CalendarPage from './calendar/CalendarPage';
 import LessonWorkPage from './lesson/LessonWorkPage';
+import StudentCreatePage from './students/StudentCreatePage';
 
 import { AuthProvider } from './AuthContext';
 import AppErrorBoundary from './AppErrorBoundary';
@@ -65,7 +66,8 @@ const App = () => (
     >
       <CustomRoutes>
         <Route path="/calendar" element={<CalendarPage />} />
-                      <Route path="/lesson-work" element={<LessonWorkPage />} />
+        <Route path="/lesson-work" element={<LessonWorkPage />} />
+        <Route path="/student-create" element={<StudentCreatePage />} />
       </CustomRoutes>
 
                     <Resource name="students" list={StudentList} create={StudentCreate} edit={StudentEdit} show={StudentShow} />

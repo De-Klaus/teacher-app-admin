@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Menu, MenuItemLink, useTranslate } from 'react-admin';
+import { MenuItemLink, useTranslate } from 'react-admin';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { Box, Typography, Divider } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import BookIcon from '@mui/icons-material/Book';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -263,6 +263,28 @@ const CustomMenu = () => {
                 borderColor: 'rgba(249, 115, 22, 0.3)',
                 transform: 'translateX(4px)',
                 boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)',
+              },
+            }}
+          />
+          
+          <MenuItemLink
+            to="/student-create"
+            primaryText="Создать ученика"
+            leftIcon={<PersonAddAltIcon sx={{ color: '#8b5cf6' }} />}
+            sx={{
+              color: '#e5e7eb',
+              fontWeight: 500,
+              padding: '10px 1em',
+              margin: '2px 0',
+              borderRadius: '8px',
+              background: 'rgba(139, 92, 246, 0.05)',
+              border: '1px solid rgba(139, 92, 246, 0.1)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                background: 'rgba(139, 92, 246, 0.15)',
+                borderColor: 'rgba(139, 92, 246, 0.3)',
+                transform: 'translateX(4px)',
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.2)',
               },
             }}
           />

@@ -44,6 +44,8 @@ const LessonWorkPage = () => {
   const [lessons, setLessons] = useState([]);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [studentsByTeacher, setStudentsByTeacher] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -146,8 +148,34 @@ const LessonWorkPage = () => {
       homework: '',
       feedback: ''
     });
+    setStudentsByTeacher([]);
     setDialogOpen(true);
   };
+
+  useEffect(() => {
+    const loadStudentsForTeacher = async () => {
+      if (!dialogOpen) return;
+      if (!formData.teacherId) {
+        setStudentsByTeacher([]);
+        setLoadingStudents(false);
+        return;
+      }
+      setLoadingStudents(true);
+      try {
+        console.log('Loading students for teacher:', formData.teacherId);
+        const list = await dataProvider.getStudentsByTeacher(formData.teacherId);
+        console.log('Loaded students:', list);
+        setStudentsByTeacher(list);
+      } catch (e) {
+        console.error('Error loading students:', e);
+        notify(String(e?.message || 'Ошибка загрузки учеников'), { type: 'warning' });
+        setStudentsByTeacher([]);
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+    loadStudentsForTeacher();
+  }, [dialogOpen, formData.teacherId, dataProvider, notify]);
 
   const handleSaveLesson = async () => {
     try {
@@ -332,6 +360,8 @@ const LessonWorkPage = () => {
                               </Box>
                             </Box>
                           }
+                          primaryTypographyProps={{ component: 'span' }}
+                          secondaryTypographyProps={{ component: 'span' }}
                         />
                         <Box>
                           <IconButton
@@ -480,8 +510,10 @@ const LessonWorkPage = () => {
               </Grid>
               
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#e5e7eb' }}>Ученик</InputLabel>
+                <FormControl fullWidth disabled={!formData.teacherId || loadingStudents}>
+                  <InputLabel sx={{ color: '#e5e7eb' }}>
+                    {loadingStudents ? 'Загрузка учеников...' : 'Ученик'}
+                  </InputLabel>
                   <Select
                     value={formData.studentId}
                     onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
@@ -501,11 +533,21 @@ const LessonWorkPage = () => {
                       },
                     }}
                   >
-                    {students.map((student) => (
-                      <MenuItem key={student.id} value={student.id} sx={{ color: '#e5e7eb' }}>
-                        {student.firstName} {student.lastName}
+                    {loadingStudents ? (
+                      <MenuItem disabled sx={{ color: '#9ca3af' }}>
+                        Загрузка учеников...
                       </MenuItem>
-                    ))}
+                    ) : studentsByTeacher.length === 0 && formData.teacherId ? (
+                      <MenuItem disabled sx={{ color: '#9ca3af' }}>
+                        У этого учителя нет учеников
+                      </MenuItem>
+                    ) : (
+                      studentsByTeacher.map((student) => (
+                        <MenuItem key={student.id} value={student.id} sx={{ color: '#e5e7eb' }}>
+                          {student.firstName} {student.lastName}
+                        </MenuItem>
+                      ))
+                    )}
                   </Select>
                 </FormControl>
               </Grid>
@@ -515,7 +557,7 @@ const LessonWorkPage = () => {
                   <InputLabel sx={{ color: '#e5e7eb' }}>Учитель</InputLabel>
                   <Select
                     value={formData.teacherId}
-                    onChange={(e) => setFormData({ ...formData, teacherId: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, teacherId: e.target.value, studentId: '' })}
                     sx={{
                       background: 'rgba(255, 255, 255, 0.1)',
                       borderRadius: '12px',

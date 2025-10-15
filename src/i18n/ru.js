@@ -1,7 +1,7 @@
 // src/i18n/ru.js
 import russianMessages from 'ra-language-russian';
 
-export default {
+const russianTranslations = {
   ...russianMessages,
   ra: {
     ...russianMessages.ra,
@@ -54,3 +54,5 @@ export default {
     availableTariffs: 'Доступных тарифов',
   },
 };
+
+export default russianTranslations;

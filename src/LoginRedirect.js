@@ -5,7 +5,7 @@ import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from './components/LoadingSpinner';
 import { useAuth } from './AuthContext';
 import { API_URL } from './config';
@@ -14,8 +14,8 @@ import './App.css';
 const LoginRedirect = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  // const location = useLocation();
+  // const from = location.state?.from?.pathname || '/';
 
   const [tab, setTab] = useState(0);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
