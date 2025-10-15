@@ -21,6 +21,7 @@ import LessonWorkPage from './lesson/LessonWorkPage';
 import StudentCreatePage from './students/StudentCreatePage';
 
 import { AuthProvider } from './AuthContext';
+import { UserProvider } from './contexts/UserContext';
 import AppErrorBoundary from './AppErrorBoundary';
 import { RequireAuth } from './RequireAuth';
 
@@ -50,7 +51,8 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <AppErrorBoundary>
+          <UserProvider>
+            <AppErrorBoundary>
             <Routes>
               <Route path="/login" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
               <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
@@ -80,6 +82,7 @@ const App = () => (
               } />
             </Routes>
           </AppErrorBoundary>
+          </UserProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

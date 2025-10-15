@@ -157,14 +157,14 @@ const mapStudentToServer = (data) => {
 const mapTeacherFromServer = (record) => {
     if (!record) return record;
     const mapped = { ...record };
-    if (record.teacherId != null) mapped.id = record.teacherId;
+    if (record.id != null) mapped.id = record.id;
     return mapped;
 };
 
 const mapTeacherToServer = (data) => {
     if (!data) return data;
     const mapped = { ...data };
-    if (data.id != null) mapped.teacherId = data.id;
+    if (data.id != null) mapped.id = data.id;
     return mapped;
 };
 
@@ -176,15 +176,15 @@ const dataProvider = {
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
         if (token) headers.set('Authorization', `Bearer ${token}`);
         try {
-            console.log(`Fetching students for teacher ${teacherId} from: ${API_URL}/teachers/${teacherId}/students`);
+            // console.log(`Fetching students for teacher ${teacherId} from: ${API_URL}/teachers/${teacherId}/students`);
             const resp = await fetchUtils.fetchJson(`${API_URL}/teachers/${teacherId}/students`, { headers });
-            console.log('Raw response:', resp);
+            
             const body = resp.json || [];
-            console.log('Response body:', body);
+            
             const items = Array.isArray(body) ? body : (body?.data || []);
-            console.log('Processed items:', items);
+           
             const mapped = items.map(mapStudentFromServer);
-            console.log('Mapped students:', mapped);
+            
             return mapped;
         } catch (error) {
             console.error('Error in getStudentsByTeacher:', error);
@@ -192,6 +192,41 @@ const dataProvider = {
             throw new Error(errorMessage);
         }
     },
+
+  // Fetch teacher by auth userId via backend: GET /teachers/by-user/{userId}
+  getTeacherByUserId: async (userId) => {
+    const headers = new Headers({ Accept: 'application/json' });
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    try {
+      const url = `${API_URL}/teachers/by-user/${userId}`;
+      const resp = await fetchUtils.fetchJson(url, { headers });
+      const body = resp.json || {};
+      // Normalize to our teacher entity shape if needed
+      return body;
+    } catch (error) {
+      console.error('Error in getTeacherByUserId:', error);
+      const errorMessage = createErrorMessage(error, 'view');
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Fetch student by auth userId via backend: GET /students/by-user/{userId}
+  getStudentByUserId: async (userId) => {
+    const headers = new Headers({ Accept: 'application/json' });
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    try {
+      const url = `${API_URL}/students/by-user/${userId}`;
+      const resp = await fetchUtils.fetchJson(url, { headers });
+      const body = resp.json || {};
+      return body;
+    } catch (error) {
+      console.error('Error in getStudentByUserId:', error);
+      const errorMessage = createErrorMessage(error, 'view');
+      throw new Error(errorMessage);
+    }
+  },
     // Fallback when backend doesn't send Content-Range header
     getList: async (resource, params) => {
         try {

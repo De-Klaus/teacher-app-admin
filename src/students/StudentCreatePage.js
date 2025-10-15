@@ -33,16 +33,18 @@ import {
   Phone,
 } from '@mui/icons-material';
 import { useDataProvider, useNotify } from 'react-admin';
-import { useAuth } from '../AuthContext';
+import { useCurrentEntity } from '../hooks/useCurrentEntity';
 import FuturisticBackground from '../components/FuturisticBackground';
 
 const StudentCreatePage = () => {
   const dataProvider = useDataProvider();
   const notify = useNotify();
-  const { user } = useAuth();
+  const { 
+    getCurrentTeacherId, 
+    canCreateStudents
+  } = useCurrentEntity();
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [currentTeacherId, setCurrentTeacherId] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,28 +60,8 @@ const StudentCreatePage = () => {
     birthDate: '',
   });
 
-  // Function to decode JWT token and get current teacher ID
-  const getCurrentTeacherId = useCallback(() => {
-    if (!user?.token) return null;
-    try {
-      const parts = user.token.split('.');
-      if (parts.length !== 3) return null;
-      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      const payload = JSON.parse(json);
-      console.log('JWT payload:', payload);
-      // Assuming the teacher ID is in the payload, adjust field name as needed
-      return payload.teacherId || payload.id || payload.userId || null;
-    } catch (error) {
-      console.error('Error decoding JWT:', error);
-      return null;
-    }
-  }, [user]);
+
+
 
   const loadData = useCallback(async () => {
     try {
@@ -91,10 +73,9 @@ const StudentCreatePage = () => {
       setStudents(studentsRes.data);
       setTeachers(teachersRes.data);
       
-      // Get current teacher ID from JWT token
+      // Get current teacher ID from context
       const teacherId = getCurrentTeacherId();
       if (teacherId) {
-        setCurrentTeacherId(teacherId);
         console.log('Current teacher ID:', teacherId);
       }
     } catch (error) {
@@ -108,6 +89,7 @@ const StudentCreatePage = () => {
   }, [loadData]);
 
   const handleCreateStudent = () => {
+    const currentTeacherId = getCurrentTeacherId();
     setFormData({
       firstName: '',
       lastName: '',
@@ -210,6 +192,29 @@ const StudentCreatePage = () => {
     return 'error';
   };
 
+
+  // Check if user has permission to access this page
+  if (!canCreateStudents()) {
+    return (
+      <FuturisticBackground>
+        <Box sx={{ padding: '2em', position: 'relative', zIndex: 1, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ 
+            color: '#e5e7eb', 
+            fontWeight: 700,
+            marginBottom: '1em'
+          }}>
+            🚫 Доступ запрещён
+          </Typography>
+          <Typography variant="h6" sx={{ 
+            color: '#9ca3af', 
+            fontWeight: 400
+          }}>
+            У вас нет прав для управления учениками
+          </Typography>
+        </Box>
+      </FuturisticBackground>
+    );
+  }
 
   return (
     <FuturisticBackground>
@@ -416,7 +421,7 @@ const StudentCreatePage = () => {
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
             ✨ Создать нового ученика
-            {currentTeacherId && (
+            {getCurrentTeacherId() && (
               <Typography variant="body2" sx={{ 
                 color: '#10b981', 
                 fontWeight: 400, 
@@ -486,29 +491,32 @@ const StudentCreatePage = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel sx={{ color: '#e5e7eb' }}>
-                    {currentTeacherId ? 'Учитель (текущий)' : 'Учитель'}
+                    {getCurrentTeacherId() ? 'Учитель (текущий)' : 'Учитель'}
                   </InputLabel>
                   <Select
                     value={formData.teacherId}
                     onChange={(e) => setFormData({ ...formData, teacherId: e.target.value })}
                     sx={commonSelectStyles}
                   >
-                    {teachers.map((teacher) => (
-                      <MenuItem 
-                        key={teacher.id} 
-                        value={teacher.id} 
-                        sx={{ 
-                          color: '#e5e7eb',
-                          background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                          '&:hover': {
-                            background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)',
-                          }
-                        }}
-                      >
-                        {teacher.firstName} {teacher.lastName}
-                        {teacher.id === currentTeacherId && ' (текущий)'}
-                      </MenuItem>
-                    ))}
+                    {teachers.map((teacher) => {
+                      const currentTeacherId = getCurrentTeacherId();
+                      return (
+                        <MenuItem 
+                          key={teacher.id} 
+                          value={teacher.id} 
+                          sx={{ 
+                            color: '#e5e7eb',
+                            background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                            '&:hover': {
+                              background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)',
+                            }
+                          }}
+                        >
+                          {teacher.firstName} {teacher.lastName}
+                          {teacher.id === currentTeacherId && ' (текущий)'}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                 </FormControl>
               </Grid>

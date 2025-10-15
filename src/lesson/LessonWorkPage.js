@@ -36,11 +36,19 @@ import {
   AttachMoney,
 } from '@mui/icons-material';
 import { useDataProvider, useNotify } from 'react-admin';
+import { useCurrentEntity } from '../hooks/useCurrentEntity';
 import FuturisticBackground from '../components/FuturisticBackground';
 
 const LessonWorkPage = () => {
   const dataProvider = useDataProvider();
   const notify = useNotify();
+  const { 
+    currentEntity, 
+    entityType, 
+    getCurrentEntity,
+    canPerformAction,
+    getEntitySpecificData
+  } = useCurrentEntity();
   const [lessons, setLessons] = useState([]);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -61,26 +69,85 @@ const LessonWorkPage = () => {
     feedback: ''
   });
 
+  // Get current teacher ID from global context
+  const getCurrentTeacherId = useCallback(() => {
+    if (entityType === 'TEACHER' && currentEntity) {
+      return currentEntity.id;
+    }
+    return null;
+  }, [entityType, currentEntity]);
+
+  // Check if user can create lessons and students
+  const canCreate = useCallback(() => {
+    return canPerformAction('CREATE_LESSONS') || canPerformAction('CREATE_STUDENTS');
+  }, [canPerformAction]);
+
+  // Check if user can see students
+  const canSeeStudents = useCallback(() => {
+    return canPerformAction('VIEW_STUDENTS');
+  }, [canPerformAction]);
+
   const loadData = useCallback(async () => {
     try {
-      const [lessonsRes, studentsRes, teachersRes] = await Promise.all([
+      const promises = [
         dataProvider.getList('lessons', { pagination: { page: 1, perPage: 100 } }),
-        dataProvider.getList('students', { pagination: { page: 1, perPage: 100 } }),
         dataProvider.getList('teachers', { pagination: { page: 1, perPage: 100 } })
-      ]);
+      ];
       
-      setLessons(lessonsRes.data);
-      setStudents(studentsRes.data);
+      // Only load students if user has permission
+      if (canSeeStudents()) {
+        promises.push(dataProvider.getList('students', { pagination: { page: 1, perPage: 100 } }));
+      }
+      
+      const results = await Promise.all(promises);
+      const [lessonsRes, teachersRes, studentsRes] = results;
+      
+      // Load entity-specific lessons if entity is available
+      let entityLessons = [];
+      if (currentEntity && entityType) {
+        entityLessons = await getEntitySpecificData(dataProvider, 'LESSONS');
+      }
+      
+      // Set lessons based on entity type
+      //console.log('Current entityType:', entityType);
+      //console.log('Current entityLessons:', entityLessons);
+      //console.log('Current entityType length:', entityLessons.length);
+      if (entityType === 'TEACHER' && entityLessons.length > 0) {
+        setLessons(entityLessons);
+      } else if (entityType === 'STUDENT' && entityLessons.length > 0) {
+        setLessons(entityLessons);
+      } else {
+        setLessons(lessonsRes.data);
+      }
+      
       setTeachers(teachersRes.data);
+      
+      // Only set students if user has permission
+      if (canSeeStudents() && studentsRes) {
+        setStudents(studentsRes.data);
+      } else {
+        setStudents([]);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
       notify('Ошибка загрузки данных', { type: 'error' });
     }
-  }, [dataProvider, notify]);
+  }, [dataProvider, notify, canSeeStudents, currentEntity, entityType, getEntitySpecificData]);
+
+  // Initialize entity on mount
+  useEffect(() => {
+    const initializeEntity = async () => {
+      if (dataProvider) {
+        await getCurrentEntity(dataProvider);
+      }
+    };
+    initializeEntity();
+  }, [getCurrentEntity, dataProvider]);
 
   useEffect(() => {
+    // Defer data loading until entity type is known (prevents null logs)
     loadData();
-  }, [loadData]);
+  }, [loadData, entityType]);
 
   useEffect(() => {
     let interval = null;
@@ -138,10 +205,13 @@ const LessonWorkPage = () => {
   };
 
   const handleCreateLesson = () => {
+
+    const currentTeacherId = getCurrentTeacherId();
+    console.log('Current teacher ID:', currentEntity.id);
     setFormData({
       topic: '',
       studentId: '',
-      teacherId: '',
+      teacherId: currentEntity.id || '',
       duration: 60,
       price: 0,
       status: 'PLANNED',
@@ -164,7 +234,6 @@ const LessonWorkPage = () => {
       try {
         console.log('Loading students for teacher:', formData.teacherId);
         const list = await dataProvider.getStudentsByTeacher(formData.teacherId);
-        console.log('Loaded students:', list);
         setStudentsByTeacher(list);
       } catch (e) {
         console.error('Error loading students:', e);
@@ -286,23 +355,25 @@ const LessonWorkPage = () => {
                   <Typography variant="h6" sx={{ color: '#e5e7eb', fontWeight: 700 }}>
                     📚 Список уроков
                   </Typography>
-                  <Button
-                    onClick={handleCreateLesson}
-                    variant="contained"
-                    startIcon={<Add />}
-                    sx={{
-                      background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
-                      color: '#0b1026',
-                      fontWeight: 700,
-                      borderRadius: '12px',
-                      '&:hover': {
-                        transform: 'translateY(-1px) scale(1.01)',
-                        filter: 'brightness(1.05)',
-                      },
-                    }}
-                  >
-                    ✨ Новый урок
-                  </Button>
+                  {canCreate() && (
+                    <Button
+                      onClick={handleCreateLesson}
+                      variant="contained"
+                      startIcon={<Add />}
+                      sx={{
+                        background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
+                        color: '#0b1026',
+                        fontWeight: 700,
+                        borderRadius: '12px',
+                        '&:hover': {
+                          transform: 'translateY(-1px) scale(1.01)',
+                          filter: 'brightness(1.05)',
+                        },
+                      }}
+                    >
+                      ✨ Новый урок
+                    </Button>
+                  )}
                 </Box>
                 
                 <List>
@@ -340,12 +411,14 @@ const LessonWorkPage = () => {
                           }
                           secondary={
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Person fontSize="small" sx={{ color: '#9ca3af' }} />
-                                <Typography variant="body2" sx={{ color: '#9ca3af' }}>
-                                  {students.find(s => s.id === lesson.studentId)?.firstName || 'Ученик'}
-                                </Typography>
-                              </Box>
+                              {canSeeStudents() && (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Person fontSize="small" sx={{ color: '#9ca3af' }} />
+                                  <Typography variant="body2" sx={{ color: '#9ca3af' }}>
+                                    {students.find(s => s.id === lesson.studentId)?.firstName || 'Ученик'}
+                                  </Typography>
+                                </Box>
+                              )}
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <Schedule fontSize="small" sx={{ color: '#9ca3af' }} />
                                 <Typography variant="body2" sx={{ color: '#9ca3af' }}>
@@ -363,40 +436,42 @@ const LessonWorkPage = () => {
                           primaryTypographyProps={{ component: 'span' }}
                           secondaryTypographyProps={{ component: 'span' }}
                         />
-                        <Box>
-                          <IconButton
-                            onClick={() => handleStartLesson(lesson)}
-                            disabled={lesson.status !== 'PLANNED'}
-                            sx={{
-                              background: 'rgba(99, 102, 241, 0.2)',
-                              color: '#6366f1',
-                              margin: '0 4px',
-                              '&:hover': {
-                                background: 'rgba(99, 102, 241, 0.3)',
-                                transform: 'scale(1.1)',
-                              },
-                              '&:disabled': {
-                                background: 'rgba(107, 114, 128, 0.2)',
-                                color: '#6b7280',
-                              }
-                            }}
-                          >
-                            <PlayArrow />
-                          </IconButton>
-                          <IconButton
-                            sx={{
-                              background: 'rgba(16, 185, 129, 0.2)',
-                              color: '#10b981',
-                              margin: '0 4px',
-                              '&:hover': {
-                                background: 'rgba(16, 185, 129, 0.3)',
-                                transform: 'scale(1.1)',
-                              },
-                            }}
-                          >
-                            <Edit />
-                          </IconButton>
-                        </Box>
+                        {canCreate() && (
+                          <Box>
+                            <IconButton
+                              onClick={() => handleStartLesson(lesson)}
+                              disabled={lesson.status !== 'PLANNED'}
+                              sx={{
+                                background: 'rgba(99, 102, 241, 0.2)',
+                                color: '#6366f1',
+                                margin: '0 4px',
+                                '&:hover': {
+                                  background: 'rgba(99, 102, 241, 0.3)',
+                                  transform: 'scale(1.1)',
+                                },
+                                '&:disabled': {
+                                  background: 'rgba(107, 114, 128, 0.2)',
+                                  color: '#6b7280',
+                                }
+                              }}
+                            >
+                              <PlayArrow />
+                            </IconButton>
+                            <IconButton
+                              sx={{
+                                background: 'rgba(16, 185, 129, 0.2)',
+                                color: '#10b981',
+                                margin: '0 4px',
+                                '&:hover': {
+                                  background: 'rgba(16, 185, 129, 0.3)',
+                                  transform: 'scale(1.1)',
+                                },
+                              }}
+                            >
+                              <Edit />
+                            </IconButton>
+                          </Box>
+                        )}
                       </ListItem>
                       {index < lessons.length - 1 && <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}
                     </React.Fragment>
@@ -455,10 +530,11 @@ const LessonWorkPage = () => {
           </Grid>
         </Grid>
 
-        {/* Create Lesson Dialog */}
-        <Dialog 
-          open={dialogOpen} 
-          onClose={() => setDialogOpen(false)}
+        {/* Create Lesson Dialog - Only show if user can create */}
+        {canCreate() && (
+          <Dialog 
+            open={dialogOpen} 
+            onClose={() => setDialogOpen(false)}
           PaperProps={{
             sx: {
               background: 'rgba(255, 255, 255, 0.1)',
@@ -477,6 +553,26 @@ const LessonWorkPage = () => {
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
             ✨ Создать новый урок
+            {currentEntity && entityType === 'TEACHER' && (
+              <Typography variant="body2" sx={{ 
+                color: '#10b981', 
+                fontWeight: 400, 
+                marginTop: '0.5em',
+                fontSize: '0.9em'
+              }}>
+                 {/* Урок будет автоматически назначен текущему учителю:{currentEntity.firstName} {currentEntity.lastName} */}
+              </Typography>
+            )}
+            {currentEntity && entityType === 'STUDENT' && (
+              <Typography variant="body2" sx={{ 
+                color: '#6366f1', 
+                fontWeight: 400, 
+                marginTop: '0.5em',
+                fontSize: '0.9em'
+              }}>
+                Создание урока для ученика: {currentEntity.firstName} {currentEntity.lastName}
+              </Typography>
+            )}
           </DialogTitle>
           <DialogContent sx={{ padding: '2em' }}>
             <Grid container spacing={2}>
@@ -553,10 +649,16 @@ const LessonWorkPage = () => {
               </Grid>
               
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#e5e7eb' }}>Учитель</InputLabel>
+                <FormControl fullWidth disabled={entityType === 'TEACHER' && currentEntity}>
+                  <InputLabel sx={{ color: '#e5e7eb' }}>
+                    {currentEntity && entityType === 'TEACHER' ? 'Учитель' : 'Учитель'}
+                  </InputLabel>
                   <Select
-                    value={formData.teacherId}
+                    value={
+                      entityType === 'TEACHER' && currentEntity
+                        ? currentEntity.id // автоматически подставляем текущего учителя
+                        : formData.id
+                    }
                     onChange={(e) => setFormData({ ...formData, teacherId: e.target.value, studentId: '' })}
                     sx={{
                       background: 'rgba(255, 255, 255, 0.1)',
@@ -574,11 +676,27 @@ const LessonWorkPage = () => {
                       },
                     }}
                   >
-                    {teachers.map((teacher) => (
-                      <MenuItem key={teacher.id} value={teacher.id} sx={{ color: '#e5e7eb' }}>
-                        {teacher.firstName} {teacher.lastName}
-                      </MenuItem>
-                    ))}
+                    {teachers.map((teacher) => {
+                      const currentTeacherId = getCurrentTeacherId();
+                       console.log('Teacher all:', teacher);
+                      console.log('Teacher:',teacher.id, teacher.teacherId, teacher.firstName, teacher.lastName, 'Current:', currentTeacherId);
+                      return (
+                        <MenuItem 
+                          key={teacher.id} 
+                          value={teacher.id} 
+                          sx={{ 
+                            color: '#e5e7eb',
+                            background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                            '&:hover': {
+                              background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)',
+                            }
+                          }}
+                        >
+                          {teacher.firstName} {teacher.lastName}
+                          {teacher.teacherId === currentTeacherId && ' (текущий)'}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                 </FormControl>
               </Grid>
@@ -682,6 +800,7 @@ const LessonWorkPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+        )}
       </Box>
     </FuturisticBackground>
   );
