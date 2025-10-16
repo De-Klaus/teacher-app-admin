@@ -24,10 +24,8 @@ export const useCurrentEntity = () => {
   useEffect(() => {
     if (!isInitialized && dataProvider) {
       const initialize = async () => {
-        console.log('🟡 [useCurrentEntity] Initializing entity...');
         await getCurrentEntity(dataProvider);
         setIsInitialized(true);
-        console.log('✅ [useCurrentEntity] Entity initialized');
       };
       initialize();
     }
@@ -36,7 +34,6 @@ export const useCurrentEntity = () => {
   // Log when entityType becomes available
   useEffect(() => {
     if (entityType) {
-      console.log('🔷 [useCurrentEntity] entityType ready:', entityType);
     }
   }, [entityType]);
 

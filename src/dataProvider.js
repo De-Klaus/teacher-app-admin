@@ -79,6 +79,7 @@ const httpClient = async (url, options = {}) => {
         if (token) {
             opts.headers.set('Authorization', `Bearer ${token}`);
         }
+        // console.log('Headers:', Object.fromEntries(opts.headers.entries()));
         return fetchUtils.fetchJson(url, opts);
     };
 

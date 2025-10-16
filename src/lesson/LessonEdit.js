@@ -28,7 +28,7 @@ const LessonEdit = (props) => (
         source="status"
         label="Статус"
         choices={[
-          { id: 'PLANNED', name: 'Запланирован' },
+          { id: 'SCHEDULED', name: 'Запланирован' },
           { id: 'COMPLETED', name: 'Проведён' },
           { id: 'CANCELLED', name: 'Отменён' },
         ]}

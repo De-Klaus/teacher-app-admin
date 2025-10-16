@@ -59,14 +59,14 @@ const LessonWorkPage = () => {
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    topic: '',
     studentId: '',
     teacherId: '',
-    duration: 60,
+    durationMinutes: 60,
     price: 0,
-    status: 'PLANNED',
+    status: 'SCHEDULED',
     homework: '',
-    feedback: ''
+    feedback: '',
+    scheduledAt: ''
   });
 
   // Get current teacher ID from global context
@@ -170,7 +170,7 @@ const LessonWorkPage = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'PLANNED': return 'primary';
+      case 'SCHEDULED': return 'primary';
       case 'COMPLETED': return 'success';
       case 'CANCELLED': return 'error';
       default: return 'default';
@@ -179,7 +179,7 @@ const LessonWorkPage = () => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'PLANNED': return 'Запланирован';
+      case 'SCHEDULED': return 'Запланирован';
       case 'COMPLETED': return 'Проведён';
       case 'CANCELLED': return 'Отменён';
       default: return status;
@@ -205,18 +205,21 @@ const LessonWorkPage = () => {
   };
 
   const handleCreateLesson = () => {
-
-    const currentTeacherId = getCurrentTeacherId();
-    console.log('Current teacher ID:', currentEntity.id);
+    // Set default scheduled time to tomorrow at 10:00
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(10, 0, 0, 0);
+    const defaultDateTime = tomorrow.toISOString().slice(0, 16);
+    
     setFormData({
-      topic: '',
       studentId: '',
       teacherId: currentEntity.id || '',
-      duration: 60,
+      durationMinutes: 60,
       price: 0,
-      status: 'PLANNED',
+      status: 'SCHEDULED',
       homework: '',
-      feedback: ''
+      feedback: '',
+      scheduledAt: defaultDateTime
     });
     setStudentsByTeacher([]);
     setDialogOpen(true);
@@ -232,7 +235,6 @@ const LessonWorkPage = () => {
       }
       setLoadingStudents(true);
       try {
-        console.log('Loading students for teacher:', formData.teacherId);
         const list = await dataProvider.getStudentsByTeacher(formData.teacherId);
         setStudentsByTeacher(list);
       } catch (e) {
@@ -248,12 +250,26 @@ const LessonWorkPage = () => {
 
   const handleSaveLesson = async () => {
     try {
+      // Convert datetime-local value to ISO string for backend
+      const scheduledAt = formData.scheduledAt ? new Date(formData.scheduledAt).toISOString() : new Date().toISOString();
+      
+      const lessonData = {
+        ...formData,
+        scheduledAt: scheduledAt,
+      };
+
+      // console.log('Отправляем на создание урока:', lessonData);
+
       await dataProvider.create('lessons', {
-        data: {
-          ...formData,
-          scheduledAt: new Date().toISOString(),
-        }
+          data: lessonData,
       });
+      
+      // await dataProvider.create('lessons', {
+      //   data: {
+      //     ...formData,
+      //     scheduledAt,
+      //   }
+      // });
       notify('Урок создан', { type: 'success' });
       setDialogOpen(false);
       loadData();
@@ -440,7 +456,7 @@ const LessonWorkPage = () => {
                           <Box>
                             <IconButton
                               onClick={() => handleStartLesson(lesson)}
-                              disabled={lesson.status !== 'PLANNED'}
+                              disabled={lesson.status !== 'SCHEDULED'}
                               sx={{
                                 background: 'rgba(99, 102, 241, 0.2)',
                                 color: '#6366f1',
@@ -514,7 +530,7 @@ const LessonWorkPage = () => {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#9ca3af' }}>Запланировано:</Typography>
                     <Typography sx={{ color: '#6366f1', fontWeight: 600 }}>
-                      {lessons.filter(l => l.status === 'PLANNED').length}
+                      {lessons.filter(l => l.status === 'SCHEDULED').length}
                     </Typography>
                   </Box>
                   
@@ -576,34 +592,6 @@ const LessonWorkPage = () => {
           </DialogTitle>
           <DialogContent sx={{ padding: '2em' }}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Тема урока"
-                  value={formData.topic}
-                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                  fullWidth
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
-                      color: '#e5e7eb',
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: '#e5e7eb',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(99, 102, 241, 0.5)',
-                    },
-                    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(99, 102, 241, 0.6)',
-                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
-                    },
-                  }}
-                />
-              </Grid>
               
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth disabled={!formData.teacherId || loadingStudents}>
@@ -614,19 +602,34 @@ const LessonWorkPage = () => {
                     value={formData.studentId}
                     onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
                     sx={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
                       borderRadius: '12px',
                       color: '#e5e7eb',
+                      backdropFilter: 'blur(8px)',
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderColor: 'rgba(255, 255, 255, 0.25)',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(99, 102, 241, 0.6)',
-                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                        borderColor: 'rgba(99, 102, 241, 0.8)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
                       },
+                      '& .MuiSelect-select': {
+                        background: 'transparent',
+                      },
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+                          border: '1px solid rgba(99,102,241,0.35)',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                          backdropFilter: 'blur(8px)',
+                          color: '#e5e7eb',
+                        }
+                      }
                     }}
                   >
                     {loadingStudents ? (
@@ -639,13 +642,60 @@ const LessonWorkPage = () => {
                       </MenuItem>
                     ) : (
                       studentsByTeacher.map((student) => (
-                        <MenuItem key={student.id} value={student.id} sx={{ color: '#e5e7eb' }}>
+                        <MenuItem
+                          key={student.id}
+                          value={student.id}
+                          sx={{
+                            color: '#e5e7eb',
+                            '&:hover': {
+                              background: 'rgba(99,102,241,0.18)'
+                            },
+                            '&.Mui-selected': {
+                              background: 'rgba(16,185,129,0.25) !important',
+                              color: '#e5e7eb'
+                            }
+                          }}
+                        >
                           {student.firstName} {student.lastName}
                         </MenuItem>
                       ))
                     )}
                   </Select>
                 </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Дата и время урока"
+                  type="datetime-local"
+                  value={formData.scheduledAt}
+                  onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
+                      borderRadius: '12px',
+                      color: '#e5e7eb',
+                      backdropFilter: 'blur(8px)',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#e5e7eb',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.25)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(99, 102, 241, 0.6)',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(99, 102, 241, 0.8)',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
+                    },
+                  }}
+                />
               </Grid>
               
               <Grid item xs={12} sm={6}>
@@ -661,25 +711,38 @@ const LessonWorkPage = () => {
                     }
                     onChange={(e) => setFormData({ ...formData, teacherId: e.target.value, studentId: '' })}
                     sx={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
                       borderRadius: '12px',
                       color: '#e5e7eb',
+                      backdropFilter: 'blur(8px)',
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderColor: 'rgba(255, 255, 255, 0.25)',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(99, 102, 241, 0.6)',
-                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                        borderColor: 'rgba(99, 102, 241, 0.8)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
                       },
+                      '& .MuiSelect-select': {
+                        background: 'transparent',
+                      },
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+                          border: '1px solid rgba(99,102,241,0.35)',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                          backdropFilter: 'blur(8px)',
+                          color: '#e5e7eb',
+                        }
+                      }
                     }}
                   >
                     {teachers.map((teacher) => {
                       const currentTeacherId = getCurrentTeacherId();
-                       console.log('Teacher all:', teacher);
-                      console.log('Teacher:',teacher.id, teacher.teacherId, teacher.firstName, teacher.lastName, 'Current:', currentTeacherId);
                       return (
                         <MenuItem 
                           key={teacher.id} 
@@ -688,7 +751,7 @@ const LessonWorkPage = () => {
                             color: '#e5e7eb',
                             background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
                             '&:hover': {
-                              background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)',
+                              background: teacher.id === currentTeacherId ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.15)',
                             }
                           }}
                         >
@@ -705,8 +768,8 @@ const LessonWorkPage = () => {
                 <TextField
                   label="Длительность (мин)"
                   type="number"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                  value={formData.durationMinutes}
+                  onChange={(e) => setFormData({ ...formData, durationMinutes: parseInt(e.target.value) })}
                   fullWidth
                   sx={{
                     '& .MuiInputBase-root': {
