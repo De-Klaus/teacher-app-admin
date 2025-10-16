@@ -58,7 +58,19 @@ const LessonWorkPage = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingLesson, setEditingLesson] = useState(null);
   const [formData, setFormData] = useState({
+    studentId: '',
+    teacherId: '',
+    durationMinutes: 60,
+    price: 0,
+    status: 'SCHEDULED',
+    homework: '',
+    feedback: '',
+    scheduledAt: ''
+  });
+  const [editFormData, setEditFormData] = useState({
     studentId: '',
     teacherId: '',
     durationMinutes: 60,
@@ -278,6 +290,49 @@ const LessonWorkPage = () => {
     }
   };
 
+  const handleEditLesson = (lesson) => {
+    setEditingLesson(lesson);
+    
+    // Format the scheduledAt date for datetime-local input
+    const scheduledDate = lesson.scheduledAt ? new Date(lesson.scheduledAt).toISOString().slice(0, 16) : '';
+    
+    setEditFormData({
+      studentId: lesson.studentId || '',
+      teacherId: lesson.teacherId || '',
+      durationMinutes: lesson.durationMinutes || 60,
+      price: lesson.price || 0,
+      status: lesson.status || 'SCHEDULED',
+      homework: lesson.homework || '',
+      feedback: lesson.feedback || '',
+      scheduledAt: scheduledDate
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveEditLesson = async () => {
+    try {
+      // Convert datetime-local value to ISO string for backend
+      const scheduledAt = editFormData.scheduledAt ? new Date(editFormData.scheduledAt).toISOString() : new Date().toISOString();
+      
+      const lessonData = {
+        ...editFormData,
+        scheduledAt: scheduledAt,
+      };
+
+      await dataProvider.update('lessons', {
+        id: editingLesson.id,
+        data: lessonData,
+      });
+      
+      notify('Урок обновлён', { type: 'success' });
+      setEditDialogOpen(false);
+      setEditingLesson(null);
+      loadData();
+    } catch (error) {
+      notify('Ошибка обновления урока', { type: 'error' });
+    }
+  };
+
   return (
     <FuturisticBackground>
       <Box sx={{ padding: '2em', position: 'relative', zIndex: 1 }}>
@@ -474,6 +529,7 @@ const LessonWorkPage = () => {
                               <PlayArrow />
                             </IconButton>
                             <IconButton
+                              onClick={() => handleEditLesson(lesson)}
                               sx={{
                                 background: 'rgba(16, 185, 129, 0.2)',
                                 color: '#10b981',
@@ -863,6 +919,376 @@ const LessonWorkPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+        )}
+
+        {/* Edit Lesson Dialog */}
+        {editDialogOpen && (
+          <Dialog 
+            open={editDialogOpen} 
+            onClose={() => setEditDialogOpen(false)}
+            maxWidth="md" 
+            fullWidth
+            PaperProps={{
+              sx: {
+                background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+                border: '1px solid rgba(99,102,241,0.3)',
+                borderRadius: '16px',
+                backdropFilter: 'blur(16px)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              }
+            }}
+          >
+            <DialogTitle sx={{ 
+              color: '#e5e7eb', 
+              fontWeight: 700, 
+              textAlign: 'center',
+              background: 'rgba(99,102,241,0.1)',
+              borderBottom: '1px solid rgba(99,102,241,0.2)'
+            }}>
+              ✏️ Редактировать урок
+            </DialogTitle>
+            <DialogContent sx={{ padding: '2em' }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: '#e5e7eb' }}>Ученик</InputLabel>
+                    <Select
+                      value={editFormData.studentId}
+                      onChange={(e) => setEditFormData({ ...editFormData, studentId: e.target.value })}
+                      sx={{
+                        background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                        backdropFilter: 'blur(8px)',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(255, 255, 255, 0.25)',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(99, 102, 241, 0.6)',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(99, 102, 241, 0.8)',
+                          boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
+                        },
+                        '& .MuiSelect-select': {
+                          background: 'transparent',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+                            border: '1px solid rgba(99,102,241,0.35)',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                            backdropFilter: 'blur(8px)',
+                            color: '#e5e7eb',
+                          }
+                        }
+                      }}
+                    >
+                      {students.map((student) => (
+                        <MenuItem 
+                          key={student.id} 
+                          value={student.id} 
+                          sx={{ 
+                            color: '#e5e7eb',
+                            '&:hover': {
+                              background: 'rgba(99,102,241,0.18)'
+                            },
+                            '&.Mui-selected': {
+                              background: 'rgba(16,185,129,0.25) !important',
+                              color: '#e5e7eb'
+                            }
+                          }}
+                        >
+                          {student.firstName} {student.lastName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Дата и время урока"
+                    type="datetime-local"
+                    value={editFormData.scheduledAt}
+                    onChange={(e) => setEditFormData({ ...editFormData, scheduledAt: e.target.value })}
+                    fullWidth
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                        backdropFilter: 'blur(8px)',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.25)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.8)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Длительность (мин)"
+                    type="number"
+                    value={editFormData.durationMinutes}
+                    onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: parseInt(e.target.value) })}
+                    fullWidth
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                      },
+                      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Цена (₽)"
+                    type="number"
+                    value={editFormData.price}
+                    onChange={(e) => setEditFormData({ ...editFormData, price: parseInt(e.target.value) })}
+                    fullWidth
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                      },
+                      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: '#e5e7eb' }}>Статус</InputLabel>
+                    <Select
+                      value={editFormData.status}
+                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                      sx={{
+                        background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                        backdropFilter: 'blur(8px)',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(255, 255, 255, 0.25)',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(99, 102, 241, 0.6)',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(99, 102, 241, 0.8)',
+                          boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
+                        },
+                        '& .MuiSelect-select': {
+                          background: 'transparent',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+                            border: '1px solid rgba(99,102,241,0.35)',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                            backdropFilter: 'blur(8px)',
+                            color: '#e5e7eb',
+                          }
+                        }
+                      }}
+                    >
+                      <MenuItem 
+                        value="SCHEDULED" 
+                        sx={{ 
+                          color: '#e5e7eb',
+                          '&:hover': {
+                            background: 'rgba(99,102,241,0.18)'
+                          },
+                          '&.Mui-selected': {
+                            background: 'rgba(16,185,129,0.25) !important',
+                            color: '#e5e7eb'
+                          }
+                        }}
+                      >
+                        Запланирован
+                      </MenuItem>
+                      <MenuItem 
+                        value="COMPLETED" 
+                        sx={{ 
+                          color: '#e5e7eb',
+                          '&:hover': {
+                            background: 'rgba(99,102,241,0.18)'
+                          },
+                          '&.Mui-selected': {
+                            background: 'rgba(16,185,129,0.25) !important',
+                            color: '#e5e7eb'
+                          }
+                        }}
+                      >
+                        Проведён
+                      </MenuItem>
+                      <MenuItem 
+                        value="CANCELLED" 
+                        sx={{ 
+                          color: '#e5e7eb',
+                          '&:hover': {
+                            background: 'rgba(99,102,241,0.18)'
+                          },
+                          '&.Mui-selected': {
+                            background: 'rgba(16,185,129,0.25) !important',
+                            color: '#e5e7eb'
+                          }
+                        }}
+                      >
+                        Отменён
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    label="Домашнее задание"
+                    multiline
+                    rows={3}
+                    value={editFormData.homework}
+                    onChange={(e) => setEditFormData({ ...editFormData, homework: e.target.value })}
+                    fullWidth
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                      },
+                      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    label="Обратная связь"
+                    multiline
+                    rows={3}
+                    value={editFormData.feedback}
+                    onChange={(e) => setEditFormData({ ...editFormData, feedback: e.target.value })}
+                    fullWidth
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#e5e7eb',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.5)',
+                      },
+                      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(99, 102, 241, 0.6)',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                      },
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions sx={{ 
+              padding: '1em 2em',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <Button 
+                onClick={handleSaveEditLesson} 
+                variant="contained" 
+                sx={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
+                  color: '#0b1026',
+                  fontWeight: 700,
+                  borderRadius: '12px',
+                  '&:hover': {
+                    transform: 'translateY(-1px) scale(1.01)',
+                    filter: 'brightness(1.05)',
+                  },
+                }}
+              >
+                ✏️ Сохранить изменения
+              </Button>
+              <Button 
+                onClick={() => setEditDialogOpen(false)} 
+                variant="outlined"
+                sx={{
+                  color: '#e5e7eb',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  borderRadius: '12px',
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: 'rgba(99, 102, 241, 0.5)',
+                  },
+                }}
+              >
+                Отмена
+              </Button>
+            </DialogActions>
+          </Dialog>
         )}
       </Box>
     </FuturisticBackground>

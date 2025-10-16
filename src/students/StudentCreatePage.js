@@ -171,19 +171,35 @@ const StudentCreatePage = () => {
   };
 
   const commonSelectStyles = {
-    background: 'rgba(255, 255, 255, 0.1)',
+    background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
     borderRadius: '12px',
     color: '#e5e7eb',
+    backdropFilter: 'blur(8px)',
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(255, 255, 255, 0.3)',
+      borderColor: 'rgba(255, 255, 255, 0.25)',
     },
     '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(99, 102, 241, 0.5)',
+      borderColor: 'rgba(99, 102, 241, 0.6)',
     },
     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'rgba(99, 102, 241, 0.6)',
-      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+      borderColor: 'rgba(99, 102, 241, 0.8)',
+      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
     },
+    '& .MuiSelect-select': {
+      background: 'transparent',
+    },
+  };
+
+  const commonMenuProps = {
+    PaperProps: {
+      sx: {
+        background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(15,23,42,0.95) 100%)',
+        border: '1px solid rgba(99,102,241,0.35)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+        backdropFilter: 'blur(8px)',
+        color: '#e5e7eb',
+      }
+    }
   };
 
   const getGradeColor = (grade) => {
@@ -497,6 +513,7 @@ const StudentCreatePage = () => {
                     value={formData.teacherId}
                     onChange={(e) => setFormData({ ...formData, teacherId: e.target.value })}
                     sx={commonSelectStyles}
+                    MenuProps={commonMenuProps}
                   >
                     {teachers.map((teacher) => {
                       const currentTeacherId = getCurrentTeacherId();
@@ -562,6 +579,7 @@ const StudentCreatePage = () => {
                     value={formData.timeZone}
                     onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
                     sx={commonSelectStyles}
+                    MenuProps={commonMenuProps}
                   >
                     <MenuItem value="UTC+3" sx={{ color: '#e5e7eb' }}>UTC+3 (Москва)</MenuItem>
                     <MenuItem value="UTC+5" sx={{ color: '#e5e7eb' }}>UTC+5 (Екатеринбург)</MenuItem>
