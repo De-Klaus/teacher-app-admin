@@ -39,6 +39,13 @@ const CustomMenu = () => {
     }
   }, [user]);
 
+  // Check if user is ADMIN
+  const isAdmin = React.useCallback(() => {
+    const roles = getUserRole();
+    if (!roles || !Array.isArray(roles)) return false;
+    return roles.includes('ADMIN');
+  }, [getUserRole]);
+
   // Check if user can create students
   const canCreateStudents = React.useCallback(() => {
     const roles = getUserRole();
@@ -135,197 +142,70 @@ const CustomMenu = () => {
           />
         </Box>
 
-        {/* Users Section */}
-        <Box sx={{ marginBottom: '1.5em' }}>
-          <Typography variant="subtitle2" sx={{
-            color: '#9ca3af',
-            fontWeight: 600,
-            padding: '0 1em',
-            marginBottom: '0.5em',
-            fontSize: '0.85em',
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-            textAlign: 'center',
-            display: 'block',
-          }}>
-            👥 {translate('menu.users')}
-          </Typography>
-          
-          <MenuItemLink
-            to="/students"
-            primaryText={translate('resources.students.name')}
-            leftIcon={<PeopleIcon sx={{ color: '#10b981' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(16, 185, 129, 0.05)',
-              border: '1px solid rgba(16, 185, 129, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(16, 185, 129, 0.15)',
-                borderColor: 'rgba(16, 185, 129, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
-              },
-            }}
-          />
-          
-          <MenuItemLink
-            to="/teachers"
-            primaryText={translate('resources.teachers.name')}
-            leftIcon={<PeopleIcon sx={{ color: '#f59e0b' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(245, 158, 11, 0.05)',
-              border: '1px solid rgba(245, 158, 11, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(245, 158, 11, 0.15)',
-                borderColor: 'rgba(245, 158, 11, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              },
-            }}
-          />
-
-          <MenuItemLink
-            to="/users/create"
-            primaryText={translate('menu.registerUser') || 'Register User'}
-            leftIcon={<PersonAddAltIcon sx={{ color: '#8b5cf6' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(139, 92, 246, 0.05)',
-              border: '1px solid rgba(139, 92, 246, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(139, 92, 246, 0.15)',
-                borderColor: 'rgba(139, 92, 246, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.2)',
-              },
-            }}
-          />
-        </Box>
-
-        {/* Lessons Section */}
-        <Box sx={{ marginBottom: '1.5em' }}>
-          <Typography variant="subtitle2" sx={{
-            color: '#9ca3af',
-            fontWeight: 600,
-            padding: '0 1em',
-            marginBottom: '0.5em',
-            fontSize: '0.85em',
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-            textAlign: 'center',
-            display: 'block',
-          }}>
-            🎓 {translate('menu.lessons')}
-          </Typography>
-          
-          <MenuItemLink
-            to="/tariffs"
-            primaryText={translate('resources.tariffs.name')}
-            leftIcon={<BookIcon sx={{ color: '#ef4444' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(239, 68, 68, 0.05)',
-              border: '1px solid rgba(239, 68, 68, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(239, 68, 68, 0.15)',
-                borderColor: 'rgba(239, 68, 68, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
-              },
-            }}
-          />
-          
-          <MenuItemLink
-            to="/calendar"
-            primaryText={translate('menu.calendar')}
-            leftIcon={<EventIcon sx={{ color: '#06b6d4' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(6, 182, 212, 0.05)',
-              border: '1px solid rgba(6, 182, 212, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(6, 182, 212, 0.15)',
-                borderColor: 'rgba(6, 182, 212, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(6, 182, 212, 0.2)',
-              },
-            }}
-          />
-          
-          <MenuItemLink
-            to="/lessons"
-            primaryText={translate('menu.lesson')}
-            leftIcon={<SchoolIcon sx={{ color: '#84cc16' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(132, 204, 22, 0.05)',
-              border: '1px solid rgba(132, 204, 22, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(132, 204, 22, 0.15)',
-                borderColor: 'rgba(132, 204, 22, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(132, 204, 22, 0.2)',
-              },
-            }}
-          />
-          
-          <MenuItemLink
-            to="/lesson-work"
-            primaryText={translate('menu.lessonWork')}
-            leftIcon={<WorkIcon sx={{ color: '#f97316' }} />}
-            sx={{
-              color: '#e5e7eb',
-              fontWeight: 500,
-              padding: '10px 1em',
-              margin: '2px 0',
-              borderRadius: '8px',
-              background: 'rgba(249, 115, 22, 0.05)',
-              border: '1px solid rgba(249, 115, 22, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(249, 115, 22, 0.15)',
-                borderColor: 'rgba(249, 115, 22, 0.3)',
-                transform: 'translateX(4px)',
-                boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)',
-              },
-            }}
-          />
-          
-          {canCreateStudents() && (
+        {/* Users Section - Only for ADMIN */}
+        {isAdmin() && (
+          <Box sx={{ marginBottom: '1.5em' }}>
+            <Typography variant="subtitle2" sx={{
+              color: '#9ca3af',
+              fontWeight: 600,
+              padding: '0 1em',
+              marginBottom: '0.5em',
+              fontSize: '0.85em',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              display: 'block',
+            }}>
+              👥 {translate('menu.users')}
+            </Typography>
+            
             <MenuItemLink
-              to="/student-create"
-              primaryText="Создать ученика"
+              to="/students"
+              primaryText={translate('resources.students.name')}
+              leftIcon={<PeopleIcon sx={{ color: '#10b981' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(16, 185, 129, 0.05)',
+                border: '1px solid rgba(16, 185, 129, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  borderColor: 'rgba(16, 185, 129, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+                },
+              }}
+            />
+            
+            <MenuItemLink
+              to="/teachers"
+              primaryText={translate('resources.teachers.name')}
+              leftIcon={<PeopleIcon sx={{ color: '#f59e0b' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(245, 158, 11, 0.05)',
+                border: '1px solid rgba(245, 158, 11, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  borderColor: 'rgba(245, 158, 11, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
+                },
+              }}
+            />
+
+            <MenuItemLink
+              to="/users/create"
+              primaryText={translate('menu.registerUser') || 'Register User'}
               leftIcon={<PersonAddAltIcon sx={{ color: '#8b5cf6' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -344,8 +224,139 @@ const CustomMenu = () => {
                 },
               }}
             />
-          )}
-        </Box>
+          </Box>
+        )}
+
+        {/* Lessons Section - Only for ADMIN */}
+        {isAdmin() && (
+          <Box sx={{ marginBottom: '1.5em' }}>
+            <Typography variant="subtitle2" sx={{
+              color: '#9ca3af',
+              fontWeight: 600,
+              padding: '0 1em',
+              marginBottom: '0.5em',
+              fontSize: '0.85em',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              display: 'block',
+            }}>
+              🎓 {translate('menu.lessons')}
+            </Typography>
+            
+            <MenuItemLink
+              to="/tariffs"
+              primaryText={translate('resources.tariffs.name')}
+              leftIcon={<BookIcon sx={{ color: '#ef4444' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(239, 68, 68, 0.05)',
+                border: '1px solid rgba(239, 68, 68, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  borderColor: 'rgba(239, 68, 68, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
+                },
+              }}
+            />
+            
+            <MenuItemLink
+              to="/calendar"
+              primaryText={translate('menu.calendar')}
+              leftIcon={<EventIcon sx={{ color: '#06b6d4' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(6, 182, 212, 0.05)',
+                border: '1px solid rgba(6, 182, 212, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(6, 182, 212, 0.15)',
+                  borderColor: 'rgba(6, 182, 212, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(6, 182, 212, 0.2)',
+                },
+              }}
+            />
+            
+            <MenuItemLink
+              to="/lessons"
+              primaryText={translate('menu.lesson')}
+              leftIcon={<SchoolIcon sx={{ color: '#84cc16' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(132, 204, 22, 0.05)',
+                border: '1px solid rgba(132, 204, 22, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(132, 204, 22, 0.15)',
+                  borderColor: 'rgba(132, 204, 22, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(132, 204, 22, 0.2)',
+                },
+              }}
+            />
+            
+            <MenuItemLink
+              to="/lesson-work"
+              primaryText={translate('menu.lessonWork')}
+              leftIcon={<WorkIcon sx={{ color: '#f97316' }} />}
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                padding: '10px 1em',
+                margin: '2px 0',
+                borderRadius: '8px',
+                background: 'rgba(249, 115, 22, 0.05)',
+                border: '1px solid rgba(249, 115, 22, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(249, 115, 22, 0.15)',
+                  borderColor: 'rgba(249, 115, 22, 0.3)',
+                  transform: 'translateX(4px)',
+                  boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)',
+                },
+              }}
+            />
+            
+            {canCreateStudents() && (
+              <MenuItemLink
+                to="/student-create"
+                primaryText="Создать ученика"
+                leftIcon={<PersonAddAltIcon sx={{ color: '#8b5cf6' }} />}
+                sx={{
+                  color: '#e5e7eb',
+                  fontWeight: 500,
+                  padding: '10px 1em',
+                  margin: '2px 0',
+                  borderRadius: '8px',
+                  background: 'rgba(139, 92, 246, 0.05)',
+                  border: '1px solid rgba(139, 92, 246, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'rgba(139, 92, 246, 0.15)',
+                    borderColor: 'rgba(139, 92, 246, 0.3)',
+                    transform: 'translateX(4px)',
+                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.2)',
+                  },
+                }}
+              />
+            )}
+          </Box>
+        )}
 
         {/* Settings Section */}
         <Box>

@@ -476,6 +476,23 @@ const dataProvider = {
             throw new Error(errorMessage);
         }
     },
+
+    // Get user by id
+    getUserById: async (userId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/users/${userId}`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getUserById:', error);
+            const errorMessage = createErrorMessage(error, 'view user');
+            throw new Error(errorMessage);
+        }
+    },
 };
 
 export default dataProvider;

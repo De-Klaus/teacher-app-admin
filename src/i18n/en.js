@@ -63,6 +63,7 @@ const englishTranslations = {
     activeTeachers: 'Active Teachers',
     availableTariffs: 'Available Tariffs',
     totalLessons: 'Total Lessons',
+    calendar: 'Calendar',
   },
   custom: {
     dashboard: {
