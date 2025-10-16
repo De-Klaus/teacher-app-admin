@@ -52,6 +52,7 @@ const russianTranslations = {
     totalStudents: 'Всего учеников',
     activeTeachers: 'Активных учителей',
     availableTariffs: 'Доступных тарифов',
+    totalLessons: 'Всего уроков',
   },
 };
 

@@ -1,10 +1,41 @@
 import * as React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
-import { useGetIdentity, useTranslate } from 'react-admin';
+import { useGetIdentity, useTranslate, useDataProvider } from 'react-admin';
 
 const Dashboard = () => {
   const { data: user } = useGetIdentity();
-  const translate = useTranslate(); // добавляем переводчик
+  const translate = useTranslate();
+  const dataProvider = useDataProvider();
+  
+  const [stats, setStats] = React.useState({
+    totalStudents: 0,
+    activeTeachers: 0,
+    availableTariffs: 0,
+    totalLessons: 0
+  });
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setLoading(true);
+        const statsData = await dataProvider.getDashboardStats();
+
+        setStats({
+          totalStudents: statsData.totalStudents,
+          activeTeachers: statsData.totalTeachers,
+          availableTariffs: statsData.availableTariffs,
+          totalLessons: statsData.totalLessons
+        });
+      } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStats();
+  }, [dataProvider]);
 
   return (
     <Box sx={{ 
@@ -117,21 +148,28 @@ const Dashboard = () => {
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               '&:last-child': { borderBottom: 'none' }
             }}>
-              {translate('page.totalStudents')}: 123
+              {translate('page.totalStudents')}: {loading ? '...' : stats.totalStudents}
             </Box>
             <Box component="li" sx={{ 
               padding: '8px 0',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               '&:last-child': { borderBottom: 'none' }
             }}>
-              {translate('page.activeTeachers')}: 15
+              {translate('page.activeTeachers')}: {loading ? '...' : stats.activeTeachers}
             </Box>
             <Box component="li" sx={{ 
               padding: '8px 0',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               '&:last-child': { borderBottom: 'none' }
             }}>
-              {translate('page.availableTariffs')}: 4
+              {translate('page.availableTariffs')}: {loading ? '...' : stats.availableTariffs}
+            </Box>
+            <Box component="li" sx={{ 
+              padding: '8px 0',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              '&:last-child': { borderBottom: 'none' }
+            }}>
+              {translate('page.totalLessons')}: {loading ? '...' : stats.totalLessons}
             </Box>
           </Box>
         </CardContent>

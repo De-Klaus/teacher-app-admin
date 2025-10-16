@@ -54,6 +54,7 @@ const LessonWorkPage = () => {
   const [teachers, setTeachers] = useState([]);
   const [studentsByTeacher, setStudentsByTeacher] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [statuses] = useState([]);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -65,7 +66,7 @@ const LessonWorkPage = () => {
     teacherId: '',
     durationMinutes: 60,
     price: 0,
-    status: 'SCHEDULED',
+    status: { name: 'SCHEDULED' },
     homework: '',
     feedback: '',
     scheduledAt: ''
@@ -75,7 +76,7 @@ const LessonWorkPage = () => {
     teacherId: '',
     durationMinutes: 60,
     price: 0,
-    status: 'SCHEDULED',
+    status: { name: 'SCHEDULED' },
     homework: '',
     feedback: '',
     scheduledAt: ''
@@ -103,7 +104,8 @@ const LessonWorkPage = () => {
     try {
       const promises = [
         dataProvider.getList('lessons', { pagination: { page: 1, perPage: 100 } }),
-        dataProvider.getList('teachers', { pagination: { page: 1, perPage: 100 } })
+        dataProvider.getList('teachers', { pagination: { page: 1, perPage: 100 } }),
+        dataProvider.getAllStatuses()
       ];
       
       // Only load students if user has permission
@@ -112,7 +114,7 @@ const LessonWorkPage = () => {
       }
       
       const results = await Promise.all(promises);
-      const [lessonsRes, teachersRes, studentsRes] = results;
+      const [lessonsRes, teachersRes, , studentsRes] = results;
       
       // Load entity-specific lessons if entity is available
       let entityLessons = [];
@@ -181,8 +183,11 @@ const LessonWorkPage = () => {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    // Handle both old string format and new object format
+    const statusName = typeof status === 'object' ? status.name : status;
+    switch (statusName) {
       case 'SCHEDULED': return 'primary';
+      case 'IN_PROGRESS': return 'warning';
       case 'COMPLETED': return 'success';
       case 'CANCELLED': return 'error';
       default: return 'default';
@@ -190,30 +195,78 @@ const LessonWorkPage = () => {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
+    // Handle both old string format and new object format
+    if (typeof status === 'object' && status.text) {
+      return status.text;
+    }
+    const statusName = typeof status === 'object' ? status.name : status;
+    switch (statusName) {
       case 'SCHEDULED': return 'Запланирован';
+      case 'IN_PROGRESS': return 'В процессе';
       case 'COMPLETED': return 'Проведён';
       case 'CANCELLED': return 'Отменён';
-      default: return status;
+      default: return statusName;
     }
   };
 
-  const handleStartLesson = (lesson) => {
-    setCurrentLesson(lesson);
-    setIsTimerRunning(true);
-    setTimerSeconds(0);
-    notify('Урок начат', { type: 'success' });
+  // Helper function to get status name from status object or string
+  const getStatusName = (status) => {
+    return typeof status === 'object' ? status.name : status;
+  };
+
+  const handleStartLesson = async (lesson) => {
+    try {
+      // Call backend to start lesson (change status to IN_PROGRESS)
+      await dataProvider.startLesson(lesson.id);
+      
+      setCurrentLesson(lesson);
+      setIsTimerRunning(true);
+      setTimerSeconds(0);
+      notify('Урок начат', { type: 'success' });
+      
+      // Reload lessons to get updated status
+      loadData();
+    } catch (error) {
+      console.error('Error starting lesson:', error);
+      notify('Ошибка начала урока', { type: 'error' });
+    }
   };
 
   const handlePauseLesson = () => {
     setIsTimerRunning(!isTimerRunning);
   };
 
-  const handleStopLesson = () => {
-    setIsTimerRunning(false);
-    setCurrentLesson(null);
-    setTimerSeconds(0);
-    notify('Урок завершён', { type: 'success' });
+  const handleStopLesson = async () => {
+    try {
+      // Call backend to complete lesson (change status to COMPLETED)
+      await dataProvider.completeLesson(currentLesson.id);
+      
+      setIsTimerRunning(false);
+      setCurrentLesson(null);
+      setTimerSeconds(0);
+      notify('Урок завершён', { type: 'success' });
+      
+      // Reload lessons to get updated status
+      loadData();
+    } catch (error) {
+      console.error('Error completing lesson:', error);
+      notify('Ошибка завершения урока', { type: 'error' });
+    }
+  };
+
+  const handleCancelLesson = async (lesson) => {
+    try {
+      // Call backend to cancel lesson (change status to CANCELED)
+      await dataProvider.cancelLesson(lesson.id);
+      
+      notify('Урок отменён', { type: 'success' });
+      
+      // Reload lessons to get updated status
+      loadData();
+    } catch (error) {
+      console.error('Error canceling lesson:', error);
+      notify('Ошибка отмены урока', { type: 'error' });
+    }
   };
 
   const handleCreateLesson = () => {
@@ -228,7 +281,7 @@ const LessonWorkPage = () => {
       teacherId: currentEntity.id || '',
       durationMinutes: 60,
       price: 0,
-      status: 'SCHEDULED',
+      status: { name: 'SCHEDULED' },
       homework: '',
       feedback: '',
       scheduledAt: defaultDateTime
@@ -301,7 +354,7 @@ const LessonWorkPage = () => {
       teacherId: lesson.teacherId || '',
       durationMinutes: lesson.durationMinutes || 60,
       price: lesson.price || 0,
-      status: lesson.status || 'SCHEDULED',
+      status: lesson.status || { name: 'SCHEDULED' },
       homework: lesson.homework || '',
       feedback: lesson.feedback || '',
       scheduledAt: scheduledDate
@@ -511,7 +564,7 @@ const LessonWorkPage = () => {
                           <Box>
                             <IconButton
                               onClick={() => handleStartLesson(lesson)}
-                              disabled={lesson.status !== 'SCHEDULED'}
+                              disabled={getStatusName(lesson.status) !== 'SCHEDULED'}
                               sx={{
                                 background: 'rgba(99, 102, 241, 0.2)',
                                 color: '#6366f1',
@@ -541,6 +594,25 @@ const LessonWorkPage = () => {
                               }}
                             >
                               <Edit />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleCancelLesson(lesson)}
+                              disabled={getStatusName(lesson.status) === 'CANCELLED' || getStatusName(lesson.status) === 'COMPLETED'}
+                              sx={{
+                                background: 'rgba(239, 68, 68, 0.2)',
+                                color: '#ef4444',
+                                margin: '0 4px',
+                                '&:hover': {
+                                  background: 'rgba(239, 68, 68, 0.3)',
+                                  transform: 'scale(1.1)',
+                                },
+                                '&:disabled': {
+                                  background: 'rgba(107, 114, 128, 0.2)',
+                                  color: '#6b7280',
+                                }
+                              }}
+                            >
+                              <Stop />
                             </IconButton>
                           </Box>
                         )}
@@ -579,14 +651,28 @@ const LessonWorkPage = () => {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#9ca3af' }}>Проведено:</Typography>
                     <Typography sx={{ color: '#10b981', fontWeight: 600 }}>
-                      {lessons.filter(l => l.status === 'COMPLETED').length}
+                      {lessons.filter(l => getStatusName(l.status) === 'COMPLETED').length}
                     </Typography>
                   </Box>
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#9ca3af' }}>Запланировано:</Typography>
                     <Typography sx={{ color: '#6366f1', fontWeight: 600 }}>
-                      {lessons.filter(l => l.status === 'SCHEDULED').length}
+                      {lessons.filter(l => getStatusName(l.status) === 'SCHEDULED').length}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: '#9ca3af' }}>В процессе:</Typography>
+                    <Typography sx={{ color: '#f59e0b', fontWeight: 600 }}>
+                      {lessons.filter(l => getStatusName(l.status) === 'IN_PROGRESS').length}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: '#9ca3af' }}>Отменено:</Typography>
+                    <Typography sx={{ color: '#ef4444', fontWeight: 600 }}>
+                      {lessons.filter(l => getStatusName(l.status) === 'CANCELED').length}
                     </Typography>
                   </Box>
                   
@@ -649,7 +735,7 @@ const LessonWorkPage = () => {
           <DialogContent sx={{ padding: '2em' }}>
             <Grid container spacing={2}>
               
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12}>
                 <FormControl fullWidth disabled={!formData.teacherId || loadingStudents}>
                   <InputLabel sx={{ color: '#e5e7eb' }}>
                     {loadingStudents ? 'Загрузка учеников...' : 'Ученик'}
@@ -879,6 +965,37 @@ const LessonWorkPage = () => {
                   }}
                 />
               </Grid>
+              
+              <Grid item xs={12}>
+                <TextField
+                  label="Обратная связь"
+                  multiline
+                  rows={3}
+                  value={formData.feedback}
+                  onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
+                  fullWidth
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
+                      color: '#e5e7eb',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#e5e7eb',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(99, 102, 241, 0.5)',
+                    },
+                    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(99, 102, 241, 0.6)',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+                    },
+                  }}
+                />
+              </Grid>
             </Grid>
           </DialogContent>
           <DialogActions sx={{ 
@@ -949,7 +1066,7 @@ const LessonWorkPage = () => {
             </DialogTitle>
             <DialogContent sx={{ padding: '2em' }}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <FormControl fullWidth>
                     <InputLabel sx={{ color: '#e5e7eb' }}>Ученик</InputLabel>
                     <Select
@@ -1106,8 +1223,8 @@ const LessonWorkPage = () => {
                   <FormControl fullWidth>
                     <InputLabel sx={{ color: '#e5e7eb' }}>Статус</InputLabel>
                     <Select
-                      value={editFormData.status}
-                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                      value={editFormData.status.name}
+                      onChange={(e) => setEditFormData({ ...editFormData, status: { name: e.target.value } })}
                       sx={{
                         background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.12) 100%)',
                         borderRadius: '12px',
@@ -1139,51 +1256,24 @@ const LessonWorkPage = () => {
                         }
                       }}
                     >
-                      <MenuItem 
-                        value="SCHEDULED" 
-                        sx={{ 
-                          color: '#e5e7eb',
-                          '&:hover': {
-                            background: 'rgba(99,102,241,0.18)'
-                          },
-                          '&.Mui-selected': {
-                            background: 'rgba(16,185,129,0.25) !important',
-                            color: '#e5e7eb'
-                          }
-                        }}
-                      >
-                        Запланирован
-                      </MenuItem>
-                      <MenuItem 
-                        value="COMPLETED" 
-                        sx={{ 
-                          color: '#e5e7eb',
-                          '&:hover': {
-                            background: 'rgba(99,102,241,0.18)'
-                          },
-                          '&.Mui-selected': {
-                            background: 'rgba(16,185,129,0.25) !important',
-                            color: '#e5e7eb'
-                          }
-                        }}
-                      >
-                        Проведён
-                      </MenuItem>
-                      <MenuItem 
-                        value="CANCELLED" 
-                        sx={{ 
-                          color: '#e5e7eb',
-                          '&:hover': {
-                            background: 'rgba(99,102,241,0.18)'
-                          },
-                          '&.Mui-selected': {
-                            background: 'rgba(16,185,129,0.25) !important',
-                            color: '#e5e7eb'
-                          }
-                        }}
-                      >
-                        Отменён
-                      </MenuItem>
+                      {statuses.map((status) => (
+                        <MenuItem 
+                          key={status.name}
+                          value={status.name} 
+                          sx={{ 
+                            color: '#e5e7eb',
+                            '&:hover': {
+                              background: 'rgba(99,102,241,0.18)'
+                            },
+                            '&.Mui-selected': {
+                              background: 'rgba(16,185,129,0.25) !important',
+                              color: '#e5e7eb'
+                            }
+                          }}
+                        >
+                          {status.text}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

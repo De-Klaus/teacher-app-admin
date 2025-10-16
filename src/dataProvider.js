@@ -384,6 +384,98 @@ const dataProvider = {
             throw new Error(errorMessage);
         }
     },
+
+    // Lesson status management methods
+    startLesson: async (lessonId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/lessons/${lessonId}/start`;
+            const resp = await fetchUtils.fetchJson(url, { 
+                method: 'PATCH',
+                headers 
+            });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in startLesson:', error);
+            const errorMessage = createErrorMessage(error, 'start lesson');
+            throw new Error(errorMessage);
+        }
+    },
+
+    completeLesson: async (lessonId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/lessons/${lessonId}/complete`;
+            const resp = await fetchUtils.fetchJson(url, { 
+                method: 'PATCH',
+                headers 
+            });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in completeLesson:', error);
+            const errorMessage = createErrorMessage(error, 'complete lesson');
+            throw new Error(errorMessage);
+        }
+    },
+
+    cancelLesson: async (lessonId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/lessons/${lessonId}/cancel`;
+            const resp = await fetchUtils.fetchJson(url, { 
+                method: 'PATCH',
+                headers 
+            });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in cancelLesson:', error);
+            const errorMessage = createErrorMessage(error, 'cancel lesson');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get all lesson statuses
+    getAllStatuses: async () => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/lesson-statuses`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getAllStatuses:', error);
+            const errorMessage = createErrorMessage(error, 'get lesson statuses');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get dashboard statistics
+    getDashboardStats: async () => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/dashboard/stats`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getDashboardStats:', error);
+            const errorMessage = createErrorMessage(error, 'get dashboard stats');
+            throw new Error(errorMessage);
+        }
+    },
 };
 
 export default dataProvider;

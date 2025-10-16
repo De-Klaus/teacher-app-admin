@@ -1,6 +1,6 @@
 import englishMessages from 'ra-language-english';
 
-export default {
+const englishTranslations = {
   ...englishMessages,
   ra: {
     ...englishMessages.ra,
@@ -62,6 +62,7 @@ export default {
     totalStudents: 'Total Students',
     activeTeachers: 'Active Teachers',
     availableTariffs: 'Available Tariffs',
+    totalLessons: 'Total Lessons',
   },
   custom: {
     dashboard: {
@@ -70,3 +71,5 @@ export default {
     },
   },
 };
+
+export default englishTranslations;

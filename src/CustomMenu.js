@@ -73,20 +73,43 @@ const CustomMenu = () => {
         textAlign: 'center',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         background: 'rgba(255, 255, 255, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'left',
+        justifyContent: 'left',
+        minHeight: '120px',
       }}>
         <Typography variant="h6" sx={{
           color: '#e5e7eb',
           fontWeight: 700,
-          fontSize: '1.1em',
-          letterSpacing: '0.5px',
-          textShadow: '0 0 20px rgba(99, 102, 241, 0.5)',
+          fontSize: '1.2em',
+          letterSpacing: '0.8px',
+          textShadow: '0 0 20px rgba(99, 102, 241, 0.6)',
+          marginBottom: '0.5em',
+          textAlign: 'left',
         }}>
           🚀 Smart Platform
+        </Typography>
+        <Typography variant="body2" sx={{
+          color: '#9ca3af',
+          fontSize: '0.85em',
+          letterSpacing: '0.3px',
+          textAlign: 'left',
+          opacity: 0.8,
+        }}>
+          Education Management System
         </Typography>
       </Box>
 
       {/* Navigation */}
-      <Box sx={{ padding: '1em 0', height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+      <Box sx={{ 
+        padding: '1em 0', 
+        height: 'calc(100vh - 180px)', 
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+      }}>
         {/* Dashboard */}
         <Box sx={{ marginBottom: '1.5em' }}>
           <MenuItemLink
@@ -122,6 +145,8 @@ const CustomMenu = () => {
             fontSize: '0.85em',
             letterSpacing: '1px',
             textTransform: 'uppercase',
+            textAlign: 'center',
+            display: 'block',
           }}>
             👥 {translate('menu.users')}
           </Typography>
@@ -203,6 +228,8 @@ const CustomMenu = () => {
             fontSize: '0.85em',
             letterSpacing: '1px',
             textTransform: 'uppercase',
+            textAlign: 'center',
+            display: 'block',
           }}>
             🎓 {translate('menu.lessons')}
           </Typography>
@@ -330,6 +357,8 @@ const CustomMenu = () => {
             fontSize: '0.85em',
             letterSpacing: '1px',
             textTransform: 'uppercase',
+            textAlign: 'center',
+            display: 'block',
           }}>
             ⚙️ {translate('menu.settings')}
           </Typography>
