@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -42,6 +43,7 @@ import FuturisticBackground from '../components/FuturisticBackground';
 const LessonWorkPage = () => {
   const dataProvider = useDataProvider();
   const notify = useNotify();
+  const navigate = useNavigate();
   const { 
     currentEntity, 
     entityType, 
@@ -81,6 +83,7 @@ const LessonWorkPage = () => {
     feedback: '',
     scheduledAt: ''
   });
+
 
   // Get current teacher ID from global context
   const getCurrentTeacherId = useCallback(() => {
@@ -224,6 +227,7 @@ const LessonWorkPage = () => {
       setTimerSeconds(0);
       notify('Урок начат', { type: 'success' });
       
+      
       // Reload lessons to get updated status
       loadData();
     } catch (error) {
@@ -245,6 +249,7 @@ const LessonWorkPage = () => {
       setCurrentLesson(null);
       setTimerSeconds(0);
       notify('Урок завершён', { type: 'success' });
+      
       
       // Reload lessons to get updated status
       loadData();
@@ -386,6 +391,7 @@ const LessonWorkPage = () => {
     }
   };
 
+
   return (
     <FuturisticBackground>
       <Box sx={{ padding: '2em', position: 'relative', zIndex: 1 }}>
@@ -457,6 +463,22 @@ const LessonWorkPage = () => {
                       >
                         <Stop />
                       </IconButton>
+                      <Button
+                        onClick={() => navigate(`/lesson/${currentLesson.id}/board`)}
+                        variant="contained"
+                        sx={{
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                          color: '#0b1026',
+                          margin: '0 8px',
+                          fontWeight: 700,
+                          '&:hover': {
+                            transform: 'scale(1.05)',
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                          },
+                        }}
+                      >
+                        🎨 Доска
+                      </Button>
                     </Box>
                   </Box>
                 </CardContent>
@@ -613,6 +635,21 @@ const LessonWorkPage = () => {
                               }}
                             >
                               <Stop />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => navigate(`/lesson/${lesson.id}/board`)}
+                              sx={{
+                                background: 'rgba(139, 92, 246, 0.2)',
+                                color: '#8b5cf6',
+                                margin: '0 4px',
+                                '&:hover': {
+                                  background: 'rgba(139, 92, 246, 0.3)',
+                                  transform: 'scale(1.1)',
+                                },
+                              }}
+                              title="Открыть доску"
+                            >
+                              🎨
                             </IconButton>
                           </Box>
                         )}
@@ -1380,6 +1417,7 @@ const LessonWorkPage = () => {
             </DialogActions>
           </Dialog>
         )}
+
       </Box>
     </FuturisticBackground>
   );

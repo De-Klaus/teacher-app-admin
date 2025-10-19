@@ -10,11 +10,11 @@ import {
 } from 'react-admin';
 
 // Fallback list in case roles endpoint isn't available
-const fallbackRoleChoices = [
-  { id: 'ROLE_ADMIN', name: 'Admin' },
-  { id: 'ROLE_TEACHER', name: 'Teacher' },
-  { id: 'ROLE_STUDENT', name: 'Student' },
-];
+// const fallbackRoleChoices = [
+//   { id: 'ROLE_ADMIN', name: 'Admin' },
+//   { id: 'ROLE_TEACHER', name: 'Teacher' },
+//   { id: 'ROLE_STUDENT', name: 'Student' },
+// ];
 
 const RolesInput = () => (
   <ReferenceArrayInput source="roles" reference="roles" perPage={50} sort={{ field: 'id', order: 'ASC' }}>

@@ -18,6 +18,7 @@ import PublicRoute from './components/PublicRoute';
 import RegisterPage from './auth/RegisterPage';
 import CalendarPage from './calendar/CalendarPage';
 import LessonWorkPage from './lesson/LessonWorkPage';
+import LessonBoardPage from './pages/LessonBoard/LessonBoardPage';
 import StudentCreatePage from './students/StudentCreatePage';
 
 import { AuthProvider } from './AuthContext';
@@ -69,6 +70,7 @@ const App = () => (
       <CustomRoutes>
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/lesson-work" element={<LessonWorkPage />} />
+        <Route path="/lesson/:lessonId/board" element={<LessonBoardPage />} />
         <Route path="/student-create" element={<StudentCreatePage />} />
       </CustomRoutes>
 
