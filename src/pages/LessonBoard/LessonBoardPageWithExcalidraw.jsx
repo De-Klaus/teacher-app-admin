@@ -6,69 +6,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import { Excalidraw } from '@excalidraw/excalidraw';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import { API_URL } from '../../config';
 import { AUTH_TOKEN_KEY } from '../../config';
-
-// Импорт Excalidraw (будет работать после установки пакета)
-// import { Excalidraw } from '@excalidraw/excalidraw';
-
-// Временная заглушка, которая будет заменена на настоящий Excalidraw
-const Excalidraw = React.forwardRef(({ onChange, ...props }, ref) => {
-  const [elements, setElements] = useState([]);
-  const [appState, setAppState] = useState({});
-
-  // Экспонируем методы через ref
-  React.useImperativeHandle(ref, () => ({
-    getSceneElements: () => elements,
-    updateScene: ({ elements: newElements, appState: newAppState }) => {
-      if (newElements) setElements(newElements);
-      if (newAppState) setAppState(newAppState);
-    }
-  }));
-
-  const handleChange = useCallback((newElements, newAppState) => {
-    setElements(newElements);
-    setAppState(newAppState);
-    if (onChange) {
-      onChange(newElements, newAppState);
-    }
-  }, [onChange]);
-
-  return (
-    <Box
-      sx={{
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f8f9fa',
-        border: '2px dashed #dee2e6',
-        borderRadius: '8px',
-        margin: '16px',
-        position: 'relative'
-      }}
-    >
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ color: '#6c757d', mb: 2 }}>
-          🎨 Excalidraw Board
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#6c757d', mb: 1 }}>
-          Элементов на доске: {elements.length}
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#6c757d' }}>
-          Excalidraw будет загружен после установки пакета
-        </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => handleChange([...elements, { id: Date.now(), type: 'rectangle' }], appState)}
-          sx={{ mt: 2 }}
-        >
-          Добавить элемент
-        </Button>
-      </Box>
-    </Box>
-  );
-});
 
 export default function LessonBoardPageWithExcalidraw() {
   const { lessonId } = useParams();
@@ -99,22 +40,69 @@ export default function LessonBoardPageWithExcalidraw() {
     if (!lessonId) return;
 
     try {
-      // Здесь будет реальное подключение к WebSocket с STOMP
-      // import SockJS from 'sockjs-client';
-      // import { Client } from '@stomp/stompjs';
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (!token) {
+        console.error('No authentication token found');
+        setError('Требуется авторизация для подключения к WebSocket');
+        return;
+      }
+
+      //console.log(`Connecting to WebSocket for lesson ${lessonId}`);
       
-      console.log(`Connecting to WebSocket for lesson ${lessonId}`);
-      
-      // Симуляция подключения
-      setTimeout(() => {
-        setIsConnected(true);
-        showSnackbar('WebSocket подключен');
-      }, 1000);
+      const socket = new SockJS(`${API_URL}/ws-board`);
+      const stompClient = new Client({
+        webSocketFactory: () => socket,
+        connectHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+        debug: (str) => console.log('STOMP:', str),
+        reconnectDelay: 5000,
+        onConnect: (frame) => {
+          //console.log('✅ Connected to WebSocket:', frame);
+          setIsConnected(true);
+          showSnackbar('WebSocket подключен');
+          
+          // Подписываемся на обновления доски
+          const topic = `/topic/lessons/${lessonId}/board`;
+          stompClient.subscribe(topic, (message) => {
+            try {
+              const data = JSON.parse(message.body);
+              //console.log('📩 Received board update:', data);
+              
+              // Обновляем Excalidraw с полученными данными
+              if (excalidrawRef.current && data.elements) {
+                excalidrawRef.current.updateScene({ 
+                  elements: data.elements,
+                  appState: data.appState || {}
+                });
+              }
+            } catch (err) {
+              console.error('Error parsing WebSocket message:', err);
+            }
+          });
+          
+          stompClientRef.current = stompClient;
+        },
+        onStompError: (frame) => {
+          console.error('❌ STOMP error:', frame.headers['message']);
+          setIsConnected(false);
+          setError('Ошибка подключения к WebSocket: ' + frame.headers['message']);
+          showSnackbar('Ошибка подключения к WebSocket');
+        },
+        onWebSocketClose: () => {
+          console.warn('⚠️ WebSocket disconnected');
+          setIsConnected(false);
+          showSnackbar('WebSocket отключен');
+        },
+      });
+
+      stompClient.activate();
       
     } catch (error) {
       console.error('WebSocket connection error:', error);
       setIsConnected(false);
       setError('Ошибка подключения к WebSocket');
+      showSnackbar('Ошибка подключения к WebSocket');
     }
   }, [lessonId, showSnackbar]);
 
@@ -130,30 +118,34 @@ export default function LessonBoardPageWithExcalidraw() {
     setIsConnected(false);
   }, []);
 
-  // Отправка изменений через WebSocket
-  const sendWebSocketUpdate = useCallback((elements, appState) => {
-    if (!isConnected || !lessonId) return;
+  // Обработка изменений в Excalidraw
+  const handleExcalidrawChange = useCallback((elements, appState) => {
+    // Отправляем изменения через WebSocket
+    if (!isConnected || !lessonId || !stompClientRef.current) return;
 
     try {
       const updateData = {
         lessonId: parseInt(lessonId),
         elements,
         appState,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: localStorage.getItem('userId') || 'anonymous'
       };
 
-      // Здесь будет реальная отправка через WebSocket
-      console.log('Sending WebSocket update:', updateData);
+      // Отправляем через STOMP на сервер
+      stompClientRef.current.publish({
+        destination: `/app/lessons/${lessonId}/board`,
+        body: JSON.stringify(elements), // Отправляем только elements для совместимости с бэкендом
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
+        },
+      });
+
+      //console.log('📤 Sent WebSocket update:', updateData);
     } catch (error) {
       console.error('WebSocket send error:', error);
     }
   }, [isConnected, lessonId]);
-
-  // Обработка изменений в Excalidraw
-  const handleExcalidrawChange = useCallback((elements, appState) => {
-    // Отправляем изменения через WebSocket
-    sendWebSocketUpdate(elements, appState);
-  }, [sendWebSocketUpdate]);
 
   // Сохранение доски
   const handleSave = useCallback(async () => {
@@ -233,14 +225,7 @@ export default function LessonBoardPageWithExcalidraw() {
     return () => {
       disconnectWebSocket();
     };
-  }, [lessonId, connectWebSocket, disconnectWebSocket, handleLoad]);
-
-  // Очистка при размонтировании
-  useEffect(() => {
-    return () => {
-      disconnectWebSocket();
-    };
-  }, [disconnectWebSocket]);
+  }, [lessonId]); // Убираем функции из зависимостей, чтобы избежать бесконечного цикла
 
   if (!lessonId) {
     return (

@@ -390,7 +390,7 @@ const Dashboard = () => {
                   marginBottom: '0.5em'
                 }}>
                   {loading ? '...' : stats.availableTariffs}
-                </Typography>
+          </Typography>
                 <Typography variant="body2" sx={{ 
                   color: '#9ca3af',
                   fontWeight: 500,
@@ -398,9 +398,9 @@ const Dashboard = () => {
                   letterSpacing: '1px'
                 }}>
                   {translate('page.availableTariffs')}
-                </Typography>
-              </CardContent>
-            </Card>
+          </Typography>
+        </CardContent>
+      </Card>
           </Grid>
 
           {/* Lessons Card */}
@@ -445,9 +445,9 @@ const Dashboard = () => {
                     letterSpacing: '1px'
                   }}>
                     {translate('page.totalLessons')}
-                  </Typography>
-                </CardContent>             
-              </Card>
+          </Typography>
+        </CardContent>
+      </Card>
             </Link>
           </Grid>
         </Grid>

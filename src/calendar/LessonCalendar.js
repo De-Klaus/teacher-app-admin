@@ -202,37 +202,37 @@ const LessonCalendar = ({ initialLessons = [] }) => {
               </Typography>
             </Box>
             <Box sx={{ height: 'calc(100% - 80px)', padding: '1em' }}>
-              <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                selectable
-                onSelectEvent={handleSelectEvent}
-                onSelectSlot={handleSelectSlot}
-                messages={{
-                  next: '→',
-                  previous: '←',
-                  today: 'Сегодня',
-                  month: 'Месяц',
-                  week: 'Неделя',
-                  day: 'День',
-                }}
+      <Calendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        selectable
+        onSelectEvent={handleSelectEvent}
+        onSelectSlot={handleSelectSlot}
+        messages={{
+          next: '→',
+          previous: '←',
+          today: 'Сегодня',
+          month: 'Месяц',
+          week: 'Неделя',
+          day: 'День',
+        }}
                 style={{ 
                   height: '100%',
                   color: '#e5e7eb'
                 }}
-                views={['month', 'week', 'day']}
-                eventPropGetter={(event) => ({
-                  style: {
-                    backgroundColor: event.backgroundColor,
-                    color: '#000',
+        views={['month', 'week', 'day']}
+        eventPropGetter={(event) => ({
+          style: {
+            backgroundColor: event.backgroundColor,
+            color: '#000',
                     borderRadius: '8px',
                     border: 'none',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  },
-                })}
-              />
+          },
+        })}
+      />
             </Box>
           </CardContent>
         </Card>
@@ -260,12 +260,12 @@ const LessonCalendar = ({ initialLessons = [] }) => {
             ✨ Добавить урок
           </DialogTitle>
           <DialogContent sx={{ padding: '2em' }}>
-            <TextField
-              label="Тема"
-              value={formData.topic}
-              onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-              fullWidth
-              margin="normal"
+          <TextField
+            label="Тема"
+            value={formData.topic}
+            onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+            fullWidth
+            margin="normal"
               sx={{
                 '& .MuiInputBase-root': {
                   background: 'rgba(255, 255, 255, 0.1)',
@@ -286,14 +286,14 @@ const LessonCalendar = ({ initialLessons = [] }) => {
                   boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
                 },
               }}
-            />
-            <TextField
-              label="Ученик"
-              select
-              value={formData.student}
-              onChange={(e) => setFormData({ ...formData, student: e.target.value })}
-              fullWidth
-              margin="normal"
+          />
+          <TextField
+            label="Ученик"
+            select
+            value={formData.student}
+            onChange={(e) => setFormData({ ...formData, student: e.target.value })}
+            fullWidth
+            margin="normal"
               sx={{
                 '& .MuiInputBase-root': {
                   background: 'rgba(255, 255, 255, 0.1)',
@@ -314,25 +314,25 @@ const LessonCalendar = ({ initialLessons = [] }) => {
                   boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
                 },
               }}
-            >
-              {students.map((student) => (
+          >
+            {students.map((student) => (
                 <MenuItem key={student.id} value={student.id} sx={{ color: '#e5e7eb' }}>
-                  {student.firstName} {student.middleName} {student.lastName}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              label="Время"
-              type="time"
-              value={formData.time || ''}
-              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-              fullWidth
-              margin="normal"
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+                {student.firstName} {student.middleName} {student.lastName}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Время"
+            type="time"
+            value={formData.time || ''}
+            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+            fullWidth
+            margin="normal"
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
               sx={{
                 '& .MuiInputBase-root': {
                   background: 'rgba(255, 255, 255, 0.1)',
@@ -353,8 +353,8 @@ const LessonCalendar = ({ initialLessons = [] }) => {
                   boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
                 },
               }}
-            />
-          </DialogContent>
+          />
+        </DialogContent>
           <DialogActions sx={{ 
             padding: '1em 2em',
             background: 'rgba(255, 255, 255, 0.05)',
@@ -375,7 +375,7 @@ const LessonCalendar = ({ initialLessons = [] }) => {
               }}
             >
               ✨ Сохранить
-            </Button>
+          </Button>
             <Button 
               onClick={() => setModalOpen(false)} 
               variant="outlined"
@@ -389,10 +389,10 @@ const LessonCalendar = ({ initialLessons = [] }) => {
                 },
               }}
             >
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
+            Отмена
+          </Button>
+        </DialogActions>
+      </Dialog>
       </Box>
     </FuturisticBackground>
   );

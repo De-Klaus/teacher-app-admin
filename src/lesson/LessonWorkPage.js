@@ -164,7 +164,7 @@ const LessonWorkPage = () => {
   useEffect(() => {
     // Defer data loading until entity type is known (prevents null logs)
     loadData();
-  }, [loadData, entityType]);
+  }, [entityType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let interval = null;
@@ -878,7 +878,7 @@ const LessonWorkPage = () => {
               </Grid>
               
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth disabled={entityType === 'TEACHER' && currentEntity}>
+                <FormControl fullWidth disabled={Boolean(entityType === 'TEACHER' && currentEntity)}>
                   <InputLabel sx={{ color: '#e5e7eb' }}>
                     {currentEntity && entityType === 'TEACHER' ? 'Учитель' : 'Учитель'}
                   </InputLabel>

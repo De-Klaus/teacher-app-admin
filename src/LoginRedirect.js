@@ -29,7 +29,7 @@ const LoginRedirect = () => {
     setError('');
     try {
       const res = await fetch(`${API_URL}/auth/sign-in`, {
-        method: 'POST',
+      method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginForm.email, password: loginForm.password }),
       });
@@ -69,8 +69,8 @@ const LoginRedirect = () => {
       await login(signInData.token);
       navigate('/', { replace: true });
 
-      setRegisterForm({ firstName: '', lastName: '', email: '', password: '' });
-      setLoginForm({ email: '', password: '' });
+        setRegisterForm({ firstName: '', lastName: '', email: '', password: '' });
+        setLoginForm({ email: '', password: '' });
     } catch (err) {
       setError(err.message || 'Registration failed');
     } finally {

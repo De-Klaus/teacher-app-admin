@@ -58,17 +58,12 @@ export default function LessonBoardPage() {
     setIsConnected(false);
   }, []);
 
-  // Отправка изменений через WebSocket
-  const sendWebSocketUpdate = useCallback((elements, appState) => {
-    if (!lessonId) return;
-    boardWebSocketService.sendBoardUpdate(lessonId, elements, appState);
-  }, [lessonId]);
-
   // Обработка изменений в Excalidraw
   const handleExcalidrawChange = useCallback((elements, appState) => {
     // Отправляем изменения через WebSocket
-    sendWebSocketUpdate(elements, appState);
-  }, [sendWebSocketUpdate]);
+    if (!lessonId) return;
+    boardWebSocketService.sendBoardUpdate(lessonId, elements, appState);
+  }, [lessonId]);
 
   // Сохранение доски
   const handleSave = useCallback(async () => {
@@ -147,14 +142,7 @@ export default function LessonBoardPage() {
     return () => {
       disconnectWebSocket();
     };
-  }, [lessonId, connectWebSocket, disconnectWebSocket, handleLoad]);
-
-  // Очистка при размонтировании
-  useEffect(() => {
-    return () => {
-      disconnectWebSocket();
-    };
-  }, [disconnectWebSocket]);
+  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!lessonId) {
     return (

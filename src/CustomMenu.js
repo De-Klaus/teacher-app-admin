@@ -159,9 +159,9 @@ const CustomMenu = () => {
               👥 {translate('menu.users')}
             </Typography>
             
-            <MenuItemLink
-              to="/students"
-              primaryText={translate('resources.students.name')}
+      <MenuItemLink
+        to="/students"
+        primaryText={translate('resources.students.name')}
               leftIcon={<PeopleIcon sx={{ color: '#10b981' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -181,9 +181,9 @@ const CustomMenu = () => {
               }}
             />
             
-            <MenuItemLink
-              to="/teachers"
-              primaryText={translate('resources.teachers.name')}
+      <MenuItemLink
+        to="/teachers"
+        primaryText={translate('resources.teachers.name')}
               leftIcon={<PeopleIcon sx={{ color: '#f59e0b' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -201,11 +201,11 @@ const CustomMenu = () => {
                   boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
                 },
               }}
-            />
+      />
 
-            <MenuItemLink
-              to="/users/create"
-              primaryText={translate('menu.registerUser') || 'Register User'}
+      <MenuItemLink
+        to="/users/create"
+        primaryText={translate('menu.registerUser') || 'Register User'}
               leftIcon={<PersonAddAltIcon sx={{ color: '#8b5cf6' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -244,9 +244,9 @@ const CustomMenu = () => {
               🎓 {translate('menu.lessons')}
             </Typography>
             
-            <MenuItemLink
-              to="/tariffs"
-              primaryText={translate('resources.tariffs.name')}
+      <MenuItemLink
+        to="/tariffs"
+        primaryText={translate('resources.tariffs.name')}
               leftIcon={<BookIcon sx={{ color: '#ef4444' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -266,9 +266,9 @@ const CustomMenu = () => {
               }}
             />
             
-            <MenuItemLink
-              to="/calendar"
-              primaryText={translate('menu.calendar')}
+      <MenuItemLink
+        to="/calendar"
+        primaryText={translate('menu.calendar')}
               leftIcon={<EventIcon sx={{ color: '#06b6d4' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -288,9 +288,9 @@ const CustomMenu = () => {
               }}
             />
             
-            <MenuItemLink
-              to="/lessons"
-              primaryText={translate('menu.lesson')}
+      <MenuItemLink
+        to="/lessons"
+        primaryText={translate('menu.lesson')}
               leftIcon={<SchoolIcon sx={{ color: '#84cc16' }} />}
               sx={{
                 color: '#e5e7eb',
@@ -374,9 +374,9 @@ const CustomMenu = () => {
             ⚙️ {translate('menu.settings')}
           </Typography>
           
-          <MenuItemLink
-            to="/settings"
-            primaryText={translate('menu.settings')}
+      <MenuItemLink
+        to="/settings"
+        primaryText={translate('menu.settings')}
             leftIcon={<SettingsIcon sx={{ color: '#6b7280' }} />}
             sx={{
               color: '#e5e7eb',
