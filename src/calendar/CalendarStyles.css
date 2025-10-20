@@ -1,8 +1,9 @@
-/* Футуристические стили для календаря */
+/* Google Calendar-like styles */
 .rbc-calendar {
   background: transparent !important;
   color: #e5e7eb !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  border-radius: 8px !important;
 }
 
 /* Заголовок календаря */
@@ -92,26 +93,55 @@
   border: 2px solid rgba(99, 102, 241, 0.3) !important;
 }
 
-/* События */
+/* События - Google Calendar style */
 .rbc-event {
-  background: linear-gradient(135deg, #6366f1 0%, #10b981 100%) !important;
-  color: #0b1026 !important;
   border: none !important;
-  border-radius: 8px !important;
-  padding: 4px 8px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-  transition: all 0.3s ease !important;
+  border-radius: 4px !important;
+  padding: 0 !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.2s ease !important;
+  cursor: move !important;
+  min-height: 40px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  overflow: hidden !important;
 }
 
 .rbc-event:hover {
-  transform: translateY(-1px) scale(1.02) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  z-index: 10 !important;
 }
 
 .rbc-event-content {
-  color: #0b1026 !important;
-  font-weight: 600 !important;
+  color: inherit !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Drag and drop styles */
+.rbc-event.rbc-selected {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  z-index: 20 !important;
+}
+
+.rbc-addons-dnd-dragging {
+  opacity: 0.7 !important;
+  transform: rotate(2deg) !important;
+}
+
+.rbc-addons-dnd-drag-preview {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: white !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Временные метки */

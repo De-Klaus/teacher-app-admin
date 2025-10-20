@@ -8,31 +8,28 @@ const CustomAppBar = (props) => (
     userMenu={false}
     sx={{
       background: 'linear-gradient(135deg, rgba(11, 16, 38, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'linear-gradient(45deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)',
-        zIndex: -1,
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      boxShadow: '0 6px 20px rgba(0, 0, 0, 0.25)',
+      '& .MuiToolbar-root': {
+        minHeight: 48,
+        paddingLeft: '12px',
+        paddingRight: '12px',
       },
-      '& .RaAppBar-menuButton': {
-        display: 'none'
+      // '& .RaAppBar-menuButton': {
+      //   display: 'none'
+      // },
+      '& .RaRefreshButton-root': {   // скрываем кнопку обновления
+      display: 'none'
       },
       '& .RaAppBar-title': {
         color: '#e5e7eb',
         fontWeight: 700,
-        fontSize: '1.5em',
+        fontSize: '1.25em',
         letterSpacing: '1px',
-        textShadow: '0 0 20px rgba(99, 102, 241, 0.6)',
-        marginLeft: '1em',
+        textShadow: '0 0 14px rgba(99, 102, 241, 0.5)',
+        marginLeft: '0.5em',
       }
     }}
   >
@@ -40,14 +37,14 @@ const CustomAppBar = (props) => (
       display: 'flex',
       alignItems: 'center',
       width: '100%',
-      padding: '0 2em',
+      padding: 0,
     }}>
       <Typography variant="h6" sx={{
         color: '#e5e7eb',
         fontWeight: 700,
-        fontSize: '1.5em',
+        fontSize: '1.25em',
         letterSpacing: '1px',
-        textShadow: '0 0 20px rgba(99, 102, 241, 0.6)',
+        textShadow: '0 0 14px rgba(99, 102, 241, 0.5)',
         '& .rocket': {
           color: '#f59e0b',
           textShadow: '0 0 10px rgba(245, 158, 11, 0.8)',
