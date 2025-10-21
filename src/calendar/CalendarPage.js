@@ -12,7 +12,6 @@ const CalendarPage = () => {
       sort: { field: 'lessonDate', order: 'ASC' },
       filter: {},
     }).then(({ data }) => {
-      console.log('Fetched data:', data);
   
       // Форматируем данные для календаря
       const formatted = data.map(lesson => {
@@ -26,7 +25,6 @@ const CalendarPage = () => {
         };
       });
   
-      console.log('Formatted events:', formatted);  // Логируем для отладки
       setEvents(formatted);
     }).catch(err => console.error('Error fetching lessons:', err));
   }, [dataProvider]);

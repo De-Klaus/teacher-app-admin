@@ -79,7 +79,7 @@ const httpClient = async (url, options = {}) => {
         if (token) {
             opts.headers.set('Authorization', `Bearer ${token}`);
         }
-        // console.log('Headers:', Object.fromEntries(opts.headers.entries()));
+        console.log('Headers:', Object.fromEntries(opts.headers.entries()));
         return fetchUtils.fetchJson(url, opts);
     };
 
@@ -377,6 +377,33 @@ const dataProvider = {
                     data: mapTeacherToServer(params.data),
                 });
                 return { ...res, data: mapTeacherFromServer(res.data) };
+            } else if (resource === 'student-teachers/by-system') {
+                // Handle custom student-teacher creation endpoint
+                const headers = new Headers({ Accept: 'application/json' });
+                const token = localStorage.getItem(AUTH_TOKEN_KEY);
+                if (token) headers.set('Authorization', `Bearer ${token}`);
+                
+                const url = `${API_URL}/student-teachers/by-system`;
+                const resp = await fetchUtils.fetchJson(url, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(params.data),
+                });
+                return { data: resp.json };
+            } else if (resource.startsWith('students/') && resource.endsWith('/claim-token')) {
+                // Handle student claim token generation endpoint
+                const headers = new Headers({ Accept: 'application/json' });
+                const token = localStorage.getItem(AUTH_TOKEN_KEY);
+                if (token) headers.set('Authorization', `Bearer ${token}`);
+                
+                const studentId = resource.split('/')[1];
+                const url = `${API_URL}/students/${studentId}/claim-token`;
+                const resp = await fetchUtils.fetchJson(url, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(params.data || {}),
+                });
+                return { data: resp.json };
             }
             return baseDataProvider.create(resource, params);
         } catch (error) {
@@ -456,6 +483,23 @@ const dataProvider = {
         } catch (error) {
             console.error('Error in getAllStatuses:', error);
             const errorMessage = createErrorMessage(error, 'get lesson statuses');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get all student statuses
+    getAllStudentStatuses: async () => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/student-statuses`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getAllStudentStatuses:', error);
+            const errorMessage = createErrorMessage(error, 'get student statuses');
             throw new Error(errorMessage);
         }
     },

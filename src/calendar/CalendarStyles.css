@@ -9,9 +9,9 @@
 /* Заголовок календаря */
 .rbc-toolbar {
   background: rgba(255, 255, 255, 0.05) !important;
-  border-radius: 12px !important;
-  padding: 1em !important;
-  margin-bottom: 1em !important;
+  border-radius: 8px !important;
+  padding: 0.5em !important;
+  margin-bottom: 0.5em !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -67,6 +67,75 @@
   border-radius: 12px !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   overflow: hidden !important;
+}
+
+/* Основной контейнер календаря */
+.rbc-calendar {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Контент календаря */
+.rbc-time-view {
+  flex: 1 !important;
+  overflow: hidden !important;
+  max-height: calc(100vh - 150px) !important;
+}
+
+/* Временной контент с прокруткой */
+.rbc-time-content {
+  overflow: auto !important;
+  height: 100% !important;
+  max-height: calc(100vh - 200px) !important;
+  scroll-behavior: smooth !important;
+}
+
+/* Скроллбар для временного контента */
+.rbc-time-content::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.rbc-time-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5) !important;
+  border-radius: 4px !important;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7) !important;
+}
+
+/* Заголовки времени */
+.rbc-time-header {
+  flex-shrink: 0 !important;
+}
+
+/* Временные слоты */
+.rbc-time-slot {
+  min-height: 30px !important;
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+}
+
+/* Группы временных слотов */
+.rbc-timeslot-group {
+  min-height: 60px !important;
+}
+
+/* Контейнер времени */
+.rbc-time-gutter {
+  width: 80px !important;
+  min-width: 80px !important;
+}
+
+/* События в слотах */
+.rbc-events-container {
+  margin-right: 0 !important;
 }
 
 /* Заголовки дней */
