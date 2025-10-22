@@ -79,8 +79,8 @@ const LessonCalendar = ({ initialLessons = [] }) => {
   const dataProvider = useDataProvider();
   const { 
     currentEntity, 
-    entityType, 
-    getCurrentEntity
+    getCurrentEntity,
+    hasRole
   } = useCurrentEntity();
   const [lessons, setLessons] = useState(initialLessons);
   const [modalOpen, setModalOpen] = useState(false);
@@ -231,7 +231,7 @@ const LessonCalendar = ({ initialLessons = [] }) => {
     });
     
     // Set default teacher if current entity is a teacher
-    const defaultTeacherId = entityType === 'TEACHER' && currentEntity ? currentEntity.id : '';
+    const defaultTeacherId = hasRole('TEACHER') && currentEntity ? currentEntity.id : '';
     
     setFormData({
       topic: '',
@@ -434,7 +434,7 @@ const LessonCalendar = ({ initialLessons = [] }) => {
       scheduledAt: lessonDate, // Use only scheduledAt field
           topic: formData.topic,
       studentId: formData.student,
-      teacherId: formData.teacherId || (entityType === 'TEACHER' && currentEntity ? currentEntity.id : ''),
+      teacherId: formData.teacherId || (hasRole('TEACHER') && currentEntity ? currentEntity.id : ''),
       durationMinutes: formData.duration || 60,
     };
 
@@ -805,7 +805,7 @@ const LessonCalendar = ({ initialLessons = [] }) => {
                 {/* 📅 {selectedDateString} */}
               </Typography>
             )}
-            {currentEntity && entityType === 'TEACHER' && (
+            {currentEntity && hasRole('TEACHER') && (
               <Box sx={{
                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%)',
                 border: '1px solid rgba(16, 185, 129, 0.3)',

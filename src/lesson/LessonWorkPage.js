@@ -48,9 +48,17 @@ const LessonWorkPage = () => {
     currentEntity, 
     entityType, 
     getCurrentEntity,
-    canPerformAction,
-    getEntitySpecificData
+    getEntitySpecificData,
+    hasAnyRole,
+    hasRole,
+    getUserRoles
   } = useCurrentEntity();
+
+  // Лог ролей пользователя
+  useEffect(() => {
+    const userRoles = getUserRoles();
+    console.log('🔐 Роли текущего пользователя:', userRoles);
+  }, [getUserRoles]);
   const [lessons, setLessons] = useState([]);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -95,13 +103,13 @@ const LessonWorkPage = () => {
 
   // Check if user can create lessons and students
   const canCreate = useCallback(() => {
-    return canPerformAction('CREATE_LESSONS') || canPerformAction('CREATE_STUDENTS');
-  }, [canPerformAction]);
+    return hasAnyRole(['TEACHER', 'ADMIN']);
+  }, [hasAnyRole]);
 
   // Check if user can see students
   const canSeeStudents = useCallback(() => {
-    return canPerformAction('VIEW_STUDENTS');
-  }, [canPerformAction]);
+    return hasAnyRole(['TEACHER', 'ADMIN', 'STUDENT']);
+  }, [hasAnyRole]);
 
   const loadData = useCallback(async () => {
     try {
@@ -129,9 +137,9 @@ const LessonWorkPage = () => {
       //console.log('Current entityType:', entityType);
       //console.log('Current entityLessons:', entityLessons);
       //console.log('Current entityType length:', entityLessons.length);
-      if (entityType === 'TEACHER' && entityLessons.length > 0) {
+      if (hasRole('TEACHER') && entityLessons.length > 0) {
         setLessons(entityLessons);
-      } else if (entityType === 'STUDENT' && entityLessons.length > 0) {
+      } else if (hasRole('STUDENT') && entityLessons.length > 0) {
         setLessons(entityLessons);
       } else {
         setLessons(lessonsRes.data);
@@ -149,7 +157,7 @@ const LessonWorkPage = () => {
       console.error('Error loading data:', error);
       notify('Ошибка загрузки данных', { type: 'error' });
     }
-  }, [dataProvider, notify, canSeeStudents, currentEntity, entityType, getEntitySpecificData]);
+  }, [dataProvider, notify, canSeeStudents, currentEntity, entityType, getEntitySpecificData, hasRole]);
 
   // Initialize entity on mount
   useEffect(() => {
@@ -748,7 +756,7 @@ const LessonWorkPage = () => {
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
             ✨ Создать новый урок
-            {currentEntity && entityType === 'TEACHER' && (
+            {currentEntity && hasRole('TEACHER') && (
               <Typography variant="body2" sx={{ 
                 color: '#10b981', 
                 fontWeight: 400, 
@@ -758,7 +766,7 @@ const LessonWorkPage = () => {
                  {/* Урок будет автоматически назначен текущему учителю:{currentEntity.firstName} {currentEntity.lastName} */}
               </Typography>
             )}
-            {currentEntity && entityType === 'STUDENT' && (
+            {currentEntity && hasRole('STUDENT') && (
               <Typography variant="body2" sx={{ 
                 color: '#6366f1', 
                 fontWeight: 400, 
@@ -878,13 +886,13 @@ const LessonWorkPage = () => {
               </Grid>
               
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth disabled={Boolean(entityType === 'TEACHER' && currentEntity)}>
+                <FormControl fullWidth disabled={Boolean(hasRole('TEACHER') && currentEntity)}>
                   <InputLabel sx={{ color: '#e5e7eb' }}>
-                    {currentEntity && entityType === 'TEACHER' ? 'Учитель' : 'Учитель'}
+                    {currentEntity && hasRole('TEACHER') ? 'Учитель' : 'Учитель'}
                   </InputLabel>
                   <Select
                     value={
-                      entityType === 'TEACHER' && currentEntity
+                      hasRole('TEACHER') && currentEntity
                         ? currentEntity.id // автоматически подставляем текущего учителя
                         : formData.id
                     }

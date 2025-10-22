@@ -2,6 +2,7 @@ import * as React from 'react';
 import { MenuItemLink, useTranslate } from 'react-admin';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useUser } from './contexts/UserContext';
 import { Box, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import BookIcon from '@mui/icons-material/Book';
@@ -16,42 +17,18 @@ import WorkIcon from '@mui/icons-material/Work';
 const CustomMenu = () => {
   const translate = useTranslate();
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
-
-  // Function to get user role from JWT token
-  const getUserRole = React.useCallback(() => {
-    if (!user?.token) return null;
-    try {
-      const parts = user.token.split('.');
-      if (parts.length !== 3) return null;
-      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      const payload = JSON.parse(json);
-      return payload.roles || null;
-    } catch (error) {
-      console.error('Error decoding JWT for role:', error);
-      return null;
-    }
-  }, [user]);
+  const { logout } = useAuth();
+  const { hasRole, hasAnyRole } = useUser();
 
   // Check if user is ADMIN
   const isAdmin = React.useCallback(() => {
-    const roles = getUserRole();
-    if (!roles || !Array.isArray(roles)) return false;
-    return roles.includes('ADMIN');
-  }, [getUserRole]);
+    return hasRole('ADMIN');
+  }, [hasRole]);
 
   // Check if user can create students
   const canCreateStudents = React.useCallback(() => {
-    const roles = getUserRole();
-    if (!roles || !Array.isArray(roles)) return false;
-    return roles.includes('TEACHER') || roles.includes('ADMIN');
-  }, [getUserRole]);
+    return hasAnyRole(['TEACHER', 'ADMIN']);
+  }, [hasAnyRole]);
 
   return (
     <Box sx={{
@@ -351,6 +328,30 @@ const CustomMenu = () => {
                     borderColor: 'rgba(139, 92, 246, 0.3)',
                     transform: 'translateX(4px)',
                     boxShadow: '0 4px 12px rgba(139, 92, 246, 0.2)',
+                  },
+                }}
+              />
+            )}
+            
+            {isAdmin() && (
+              <MenuItemLink
+                to="/teacher-create"
+                primaryText="Создать учителя"
+                leftIcon={<PersonAddAltIcon sx={{ color: '#f59e0b' }} />}
+                sx={{
+                  color: '#e5e7eb',
+                  fontWeight: 500,
+                  padding: '10px 1em',
+                  margin: '2px 0',
+                  borderRadius: '8px',
+                  background: 'rgba(245, 158, 11, 0.05)',
+                  border: '1px solid rgba(245, 158, 11, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    borderColor: 'rgba(245, 158, 11, 0.3)',
+                    transform: 'translateX(4px)',
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
                   },
                 }}
               />

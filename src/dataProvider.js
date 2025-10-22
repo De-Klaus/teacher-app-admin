@@ -79,7 +79,7 @@ const httpClient = async (url, options = {}) => {
         if (token) {
             opts.headers.set('Authorization', `Bearer ${token}`);
         }
-        console.log('Headers:', Object.fromEntries(opts.headers.entries()));
+        //console.log('Headers:', Object.fromEntries(opts.headers.entries()));
         return fetchUtils.fetchJson(url, opts);
     };
 
@@ -534,6 +534,57 @@ const dataProvider = {
         } catch (error) {
             console.error('Error in getUserById:', error);
             const errorMessage = createErrorMessage(error, 'view user');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get users with TEACHER role
+    getUsersByRole: async (role) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/users/by-role/${role}`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getUsersByRole:', error);
+            const errorMessage = createErrorMessage(error, 'get users by role');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get users without teacher entity
+    getUsersWithoutTeacher: async () => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/users/without-teacher`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getUsersWithoutTeacher:', error);
+            const errorMessage = createErrorMessage(error, 'get users without teacher');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Get time zones from dictionary
+    getTimeZones: async () => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/dictionary/timezones`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in getTimeZones:', error);
+            const errorMessage = createErrorMessage(error, 'get time zones');
             throw new Error(errorMessage);
         }
     },

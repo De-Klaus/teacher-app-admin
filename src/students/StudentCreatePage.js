@@ -48,6 +48,7 @@ const StudentCreatePage = () => {
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [timeZones, setTimeZones] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [claimTokenDialog, setClaimTokenDialog] = useState(false);
@@ -74,13 +75,15 @@ const StudentCreatePage = () => {
 
   const loadData = useCallback(async () => {
     try {
-      const [studentsRes, teachersRes] = await Promise.all([
+      const [studentsRes, teachersRes, timeZonesRes] = await Promise.all([
         dataProvider.getList('students', { pagination: { page: 1, perPage: 100 } }),
-        dataProvider.getList('teachers', { pagination: { page: 1, perPage: 100 } })
+        dataProvider.getList('teachers', { pagination: { page: 1, perPage: 100 } }),
+        dataProvider.getTimeZones()
       ]);
       
       setStudents(studentsRes.data);
       setTeachers(teachersRes.data);
+      setTimeZones(timeZonesRes);
       
       // Load statuses using dataProvider method (same pattern as lesson statuses)
       try {
@@ -760,12 +763,21 @@ const StudentCreatePage = () => {
                     sx={commonSelectStyles}
                     MenuProps={commonMenuProps}
                   >
-                    <MenuItem value="UTC+3" sx={{ color: '#e5e7eb' }}>UTC+3 (Москва)</MenuItem>
-                    <MenuItem value="UTC+5" sx={{ color: '#e5e7eb' }}>UTC+5 (Екатеринбург)</MenuItem>
-                    <MenuItem value="UTC+7" sx={{ color: '#e5e7eb' }}>UTC+7 (Красноярск)</MenuItem>
-                    <MenuItem value="UTC+8" sx={{ color: '#e5e7eb' }}>UTC+8 (Иркутск)</MenuItem>
-                    <MenuItem value="UTC+9" sx={{ color: '#e5e7eb' }}>UTC+9 (Якутск)</MenuItem>
-                    <MenuItem value="UTC+10" sx={{ color: '#e5e7eb' }}>UTC+10 (Владивосток)</MenuItem>
+                    {timeZones.length === 0 ? (
+                      <MenuItem disabled sx={{ color: '#9ca3af' }}>
+                        Загрузка часовых поясов...
+                      </MenuItem>
+                    ) : (
+                      timeZones.map((timeZone) => (
+                        <MenuItem 
+                          key={timeZone.value} 
+                          value={timeZone.value} 
+                          sx={{ color: '#e5e7eb' }}
+                        >
+                          {timeZone.label}
+                        </MenuItem>
+                      ))
+                    )}
                   </Select>
                 </FormControl>
               </Grid>

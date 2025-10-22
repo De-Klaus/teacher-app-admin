@@ -20,6 +20,7 @@ import CalendarPage from './calendar/CalendarPage';
 import LessonWorkPage from './lesson/LessonWorkPage';
 import LessonBoardPage from './pages/LessonBoard/LessonBoardPage';
 import StudentCreatePage from './students/StudentCreatePage';
+import TeacherCreatePage from './teachers/TeacherCreatePage';
 
 import { AuthProvider } from './AuthContext';
 import { UserProvider } from './contexts/UserContext';
@@ -72,6 +73,7 @@ const App = () => (
         <Route path="/lesson-work" element={<LessonWorkPage />} />
         <Route path="/lesson/:lessonId/board" element={<LessonBoardPage />} />
         <Route path="/student-create" element={<StudentCreatePage />} />
+        <Route path="/teacher-create" element={<TeacherCreatePage />} />
       </CustomRoutes>
 
                     <Resource name="students" list={StudentList} create={StudentCreate} edit={StudentEdit} show={StudentShow} />

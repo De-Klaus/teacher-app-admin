@@ -16,6 +16,9 @@ export const useCurrentEntity = () => {
     getCurrentEntity,
     canPerformAction,
     getEntitySpecificData,
+    hasAnyRole,
+    hasRole,
+    getUserRoles
   } = useUser();
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -42,7 +45,7 @@ export const useCurrentEntity = () => {
 
   // Get current teacher ID
   const getCurrentTeacherId = useCallback(() => {
-    if (entityType === 'TEACHER' && currentEntity) return currentEntity.id;
+    if (hasRole('TEACHER') && currentEntity) return currentEntity.id;
     // Fallback to JWT teacherId while entity resolves
     try {
       if (!user?.token) return null;
@@ -60,19 +63,19 @@ export const useCurrentEntity = () => {
     } catch {
       return null;
     }
-  }, [entityType, currentEntity, user]);
+  }, [hasRole, currentEntity, user]);
 
   // Get current student ID
   const getCurrentStudentId = useCallback(() => {
-    if (entityType === 'STUDENT' && currentEntity) return currentEntity.id;
+    if (hasRole('STUDENT') && currentEntity) return currentEntity.id;
     return null;
-  }, [entityType, currentEntity]);
+  }, [hasRole, currentEntity]);
 
   // Permission checks
-  const canCreateLessons = useCallback(() => canPerformAction('CREATE_LESSONS'), [canPerformAction]);
-  const canCreateStudents = useCallback(() => canPerformAction('CREATE_STUDENTS'), [canPerformAction]);
-  const canSeeStudents = useCallback(() => canPerformAction('VIEW_STUDENTS'), [canPerformAction]);
-  const canManageLessons = useCallback(() => canPerformAction('MANAGE_LESSONS'), [canPerformAction]);
+  const canCreateLessons = useCallback(() => hasAnyRole(['TEACHER', 'ADMIN']), [hasAnyRole]);
+  const canCreateStudents = useCallback(() => hasAnyRole(['TEACHER', 'ADMIN']), [hasAnyRole]);
+  const canSeeStudents = useCallback(() => hasAnyRole(['TEACHER', 'ADMIN', 'STUDENT']), [hasAnyRole]);
+  const canManageLessons = useCallback(() => hasAnyRole(['TEACHER', 'ADMIN']), [hasAnyRole]);
 
   // Fetch entity-specific lessons
   const getEntityLessons = useCallback(async () => {
@@ -82,11 +85,11 @@ export const useCurrentEntity = () => {
 
   // Fetch students for current teacher
   const getTeacherStudents = useCallback(async () => {
-    if (entityType === 'TEACHER' && currentEntity && dataProvider) {
+    if (hasRole('TEACHER') && currentEntity && dataProvider) {
       return getEntitySpecificData(dataProvider, 'STUDENTS');
     }
     return [];
-  }, [entityType, currentEntity, dataProvider, getEntitySpecificData]);
+  }, [hasRole, currentEntity, dataProvider, getEntitySpecificData]);
 
   // Display name of the entity
   const entityDisplayName = useMemo(() => {
@@ -134,5 +137,8 @@ export const useCurrentEntity = () => {
     getCurrentEntity,
     canPerformAction,
     getEntitySpecificData,
+    hasAnyRole,
+    hasRole,
+    getUserRoles,
   };
 };

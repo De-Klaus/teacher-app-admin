@@ -195,6 +195,27 @@ export const UserProvider = ({ children }) => {
     console.log('Cleared current entity');
   }, []);
 
+  // Helper function to check if user has any of the specified roles
+  const hasAnyRole = useCallback((requiredRoles) => {
+    const roles = getUserRoles();
+    if (!roles || !Array.isArray(roles) || !Array.isArray(requiredRoles)) return false;
+    return requiredRoles.some(role => roles.includes(role));
+  }, [getUserRoles]);
+
+  // Helper function to check if user has all of the specified roles
+  const hasAllRoles = useCallback((requiredRoles) => {
+    const roles = getUserRoles();
+    if (!roles || !Array.isArray(roles) || !Array.isArray(requiredRoles)) return false;
+    return requiredRoles.every(role => roles.includes(role));
+  }, [getUserRoles]);
+
+  // Helper function to check if user has specific role
+  const hasRole = useCallback((role) => {
+    const roles = getUserRoles();
+    if (!roles || !Array.isArray(roles)) return false;
+    return roles.includes(role);
+  }, [getUserRoles]);
+
   // Function to check if user can perform action based on role
   const canPerformAction = useCallback((action) => {
     const roles = getUserRoles();
@@ -204,22 +225,22 @@ export const UserProvider = ({ children }) => {
       case 'CREATE_LESSONS':
       case 'CREATE_STUDENTS':
       case 'MANAGE_LESSONS':
-        return roles.includes('TEACHER') || roles.includes('ADMIN');
+        return hasAnyRole(['TEACHER', 'ADMIN']);
       
       case 'VIEW_LESSONS':
       case 'VIEW_STUDENTS':
-        return roles.includes('TEACHER') || roles.includes('ADMIN') || roles.includes('STUDENT');
+        return hasAnyRole(['TEACHER', 'ADMIN', 'STUDENT']);
       
       case 'VIEW_OWN_LESSONS':
-        return roles.includes('STUDENT');
+        return hasRole('STUDENT');
       
       case 'ADMIN_ACTIONS':
-        return roles.includes('ADMIN');
+        return hasRole('ADMIN');
       
       default:
         return false;
     }
-  }, [getUserRoles]);
+  }, [getUserRoles, hasAnyRole, hasRole]);
 
   // Function to get entity-specific data
   const getEntitySpecificData = useCallback(async (dataProvider, dataType) => {
@@ -228,13 +249,13 @@ export const UserProvider = ({ children }) => {
     try {
       switch (dataType) {
         case 'LESSONS':
-          if (entityType === 'TEACHER') {
+          if (hasRole('TEACHER')) {
             // Get lessons for this teacher
             const lessonsRes = await dataProvider.getList('lessons', { 
               pagination: { page: 1, perPage: 100 } 
             });
             return lessonsRes.data.filter(lesson => lesson.teacherId === currentEntity.id);
-          } else if (entityType === 'STUDENT') {
+          } else if (hasRole('STUDENT')) {
             // Get lessons for this student
             const lessonsRes = await dataProvider.getList('lessons', { 
               pagination: { page: 1, perPage: 100 } 
@@ -244,7 +265,7 @@ export const UserProvider = ({ children }) => {
           break;
           
         case 'STUDENTS':
-          if (entityType === 'TEACHER') {
+          if (hasRole('TEACHER')) {
             // Get students for this teacher
             return await dataProvider.getStudentsByTeacher(currentEntity.id);
           }
@@ -259,7 +280,7 @@ export const UserProvider = ({ children }) => {
     }
     
     return [];
-  }, [currentEntity, entityType]);
+  }, [currentEntity, entityType, hasRole]);
 
   const value = {
     currentEntity,
@@ -272,7 +293,10 @@ export const UserProvider = ({ children }) => {
     getEntitySpecificData,
     getUserRoles,
     getUserId,
-    determineEntityType
+    determineEntityType,
+    hasAnyRole,
+    hasAllRoles,
+    hasRole
   };
 
   return (
