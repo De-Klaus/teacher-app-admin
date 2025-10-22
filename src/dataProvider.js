@@ -588,6 +588,21 @@ const dataProvider = {
             throw new Error(errorMessage);
         }
     },
+
+    // Register by token
+    registerByToken: async (token) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        try {
+            const url = `${API_URL}/users/register-by-token?token=${token}`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in registerByToken:', error);
+            const errorMessage = createErrorMessage(error, 'register by token');
+            throw new Error(errorMessage);
+        }
+    },
 };
 
 export default dataProvider;

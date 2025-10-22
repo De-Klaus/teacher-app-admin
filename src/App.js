@@ -15,7 +15,7 @@ import Dashboard from './Dashboard';
 
 import LoginRedirect from './LoginRedirect';
 import PublicRoute from './components/PublicRoute';
-import RegisterPage from './auth/RegisterPage';
+import RegisterByTokenPage from './auth/RegisterByTokenPage';
 import CalendarPage from './calendar/CalendarPage';
 import LessonWorkPage from './lesson/LessonWorkPage';
 import LessonBoardPage from './pages/LessonBoard/LessonBoardPage';
@@ -57,7 +57,7 @@ const App = () => (
             <AppErrorBoundary>
             <Routes>
               <Route path="/login" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
-              <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><RegisterByTokenPage /></PublicRoute>} />
               <Route path="/*" element={
                 <RequireAuth>
     <Admin 

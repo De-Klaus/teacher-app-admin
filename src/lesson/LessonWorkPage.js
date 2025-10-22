@@ -661,6 +661,27 @@ const LessonWorkPage = () => {
                             </IconButton>
                           </Box>
                         )}
+                        
+                        {/* Кнопка доски для студентов */}
+                        {hasRole('STUDENT') && !canCreate() && (
+                          <Box>
+                            <IconButton
+                              onClick={() => navigate(`/lesson/${lesson.id}/board`)}
+                              sx={{
+                                background: 'rgba(139, 92, 246, 0.2)',
+                                color: '#8b5cf6',
+                                margin: '0 4px',
+                                '&:hover': {
+                                  background: 'rgba(139, 92, 246, 0.3)',
+                                  transform: 'scale(1.1)',
+                                },
+                              }}
+                              title="Открыть доску"
+                            >
+                              🎨
+                            </IconButton>
+                          </Box>
+                        )}
                       </ListItem>
                       {index < lessons.length - 1 && <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}
                     </React.Fragment>

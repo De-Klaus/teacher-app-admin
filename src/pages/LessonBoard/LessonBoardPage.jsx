@@ -6,10 +6,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import { Excalidraw } from '@excalidraw/excalidraw';
-import boardWebSocketService from '../../services/boardWebSocketService';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import { API_URL } from '../../config';
 import { AUTH_TOKEN_KEY } from '../../config';
-
 
 export default function LessonBoardPage() {
   const { lessonId } = useParams();
@@ -24,6 +24,10 @@ export default function LessonBoardPage() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
+  // WebSocket соединение
+  const stompClientRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
+
   // Показать уведомление
   const showSnackbar = useCallback((message) => {
     setSnackbarMessage(message);
@@ -34,36 +38,114 @@ export default function LessonBoardPage() {
   const connectWebSocket = useCallback(() => {
     if (!lessonId) return;
 
-    boardWebSocketService.connect(
-      lessonId,
-      () => {
-        setIsConnected(true);
-        showSnackbar('WebSocket подключен');
-      },
-      () => {
-        setIsConnected(false);
-        showSnackbar('WebSocket отключен');
-      },
-      (error) => {
-        setIsConnected(false);
-        setError('Ошибка подключения к WebSocket');
-        showSnackbar('Ошибка подключения к WebSocket');
+    try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (!token) {
+        console.error('No authentication token found');
+        setError('Требуется авторизация для подключения к WebSocket');
+        return;
       }
-    );
+
+      //console.log(`Connecting to WebSocket for lesson ${lessonId}`);
+      
+      const socket = new SockJS(`${API_URL}/ws-board`);
+      const stompClient = new Client({
+        webSocketFactory: () => socket,
+        connectHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+        debug: (str) => console.log('STOMP:', str),
+        reconnectDelay: 5000,
+        onConnect: (frame) => {
+          //console.log('✅ Connected to WebSocket:', frame);
+          setIsConnected(true);
+          showSnackbar('WebSocket подключен');
+          
+          // Подписываемся на обновления доски
+          const topic = `/topic/lessons/${lessonId}/board`;
+          stompClient.subscribe(topic, (message) => {
+            try {
+              const data = JSON.parse(message.body);
+              //console.log('📩 Received board update:', data);
+              
+              // Обновляем Excalidraw с полученными данными
+              if (excalidrawRef.current && data.elements) {
+                excalidrawRef.current.updateScene({ 
+                  elements: data.elements,
+                  appState: data.appState || {}
+                });
+              }
+            } catch (err) {
+              console.error('Error parsing WebSocket message:', err);
+            }
+          });
+          
+          stompClientRef.current = stompClient;
+        },
+        onStompError: (frame) => {
+          console.error('❌ STOMP error:', frame.headers['message']);
+          setIsConnected(false);
+          setError('Ошибка подключения к WebSocket: ' + frame.headers['message']);
+          showSnackbar('Ошибка подключения к WebSocket');
+        },
+        onWebSocketClose: () => {
+          console.warn('⚠️ WebSocket disconnected');
+          setIsConnected(false);
+          showSnackbar('WebSocket отключен');
+        },
+      });
+
+      stompClient.activate();
+      
+    } catch (error) {
+      console.error('WebSocket connection error:', error);
+      setIsConnected(false);
+      setError('Ошибка подключения к WebSocket');
+      showSnackbar('Ошибка подключения к WebSocket');
+    }
   }, [lessonId, showSnackbar]);
 
   // Отключение от WebSocket
   const disconnectWebSocket = useCallback(() => {
-    boardWebSocketService.disconnect();
+    if (stompClientRef.current) {
+      try {
+        // В новых версиях @stomp/stompjs используется deactivate() вместо disconnect()
+        if (typeof stompClientRef.current.deactivate === 'function') {
+          stompClientRef.current.deactivate();
+        } else if (typeof stompClientRef.current.disconnect === 'function') {
+          stompClientRef.current.disconnect();
+        }
+      } catch (error) {
+        console.warn('Error disconnecting WebSocket:', error);
+      }
+      stompClientRef.current = null;
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
     setIsConnected(false);
   }, []);
 
   // Обработка изменений в Excalidraw
   const handleExcalidrawChange = useCallback((elements, appState) => {
     // Отправляем изменения через WebSocket
-    if (!lessonId) return;
-    boardWebSocketService.sendBoardUpdate(lessonId, elements, appState);
-  }, [lessonId]);
+    if (!isConnected || !lessonId || !stompClientRef.current) return;
+
+    try {
+      // Проверяем, что клиент активен перед отправкой
+      if (stompClientRef.current && typeof stompClientRef.current.publish === 'function') {
+        stompClientRef.current.publish({
+          destination: `/app/lessons/${lessonId}/board`,
+          body: JSON.stringify(elements), // Отправляем только elements для совместимости с бэкендом
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('WebSocket send error:', error);
+    }
+  }, [isConnected, lessonId]);
 
   // Сохранение доски
   const handleSave = useCallback(async () => {
@@ -112,10 +194,8 @@ export default function LessonBoardPage() {
           'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`
         }
       });
-      
+
       if (!response.ok) {
-        const text = await response.text(); // читаем тело ответа как текст
-        console.error('Server error response:', text);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -140,9 +220,12 @@ export default function LessonBoardPage() {
     }
 
     return () => {
-      disconnectWebSocket();
+      // Безопасное отключение при размонтировании компонента
+      if (stompClientRef.current) {
+        disconnectWebSocket();
+      }
     };
-  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lessonId, connectWebSocket, handleLoad, disconnectWebSocket]);
 
   if (!lessonId) {
     return (

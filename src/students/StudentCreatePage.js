@@ -881,12 +881,12 @@ const StudentCreatePage = () => {
                   padding: '1em',
                   border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                  <Typography variant="body2" sx={{ color: '#9ca3af', marginBottom: '0.5em' }}>
+                  {/* <Typography variant="body2" sx={{ color: '#9ca3af', marginBottom: '0.5em' }}>
                     ID ученика:
                   </Typography>
                   <Typography sx={{ color: '#e5e7eb', fontWeight: 600, marginBottom: '1em' }}>
-                    {claimTokenData.studentId}
-                  </Typography>
+                    {claimTokenData.id}
+                  </Typography> */}
                   
                   <Typography variant="body2" sx={{ color: '#9ca3af', marginBottom: '0.5em' }}>
                     Токен:
