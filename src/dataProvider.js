@@ -603,6 +603,64 @@ const dataProvider = {
             throw new Error(errorMessage);
         }
     },
+
+    // ===== Google Calendar API =====
+
+    // Sync user's Google Calendar
+    syncGoogleCalendar: async (userId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/api/google/calendar/sync?userId=${userId}`;
+            const resp = await fetchUtils.fetchJson(url, { 
+                method: 'GET',
+                headers 
+            });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in syncGoogleCalendar:', error);
+            const errorMessage = createErrorMessage(error, 'sync Google calendar');
+            throw new Error(errorMessage);
+        }
+    },
+
+    // Check if user has connected Google account
+    checkGoogleConnection: async (userId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/api/google/calendar/connected?userId=${userId}`;
+            const resp = await fetchUtils.fetchJson(url, { headers });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in checkGoogleConnection:', error);
+            return { connected: false };
+        }
+    },
+
+    // Disconnect Google account
+    disconnectGoogle: async (userId) => {
+        const headers = new Headers({ Accept: 'application/json' });
+        const token = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        try {
+            const url = `${API_URL}/api/google/disconnect?userId=${userId}`;
+            const resp = await fetchUtils.fetchJson(url, { 
+                method: 'POST',
+                headers 
+            });
+            const body = resp.json || {};
+            return body;
+        } catch (error) {
+            console.error('Error in disconnectGoogle:', error);
+            const errorMessage = createErrorMessage(error, 'disconnect Google');
+            throw new Error(errorMessage);
+        }
+    },
 };
 
 export default dataProvider;
